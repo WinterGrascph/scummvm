@@ -12,6 +12,7 @@
 
 #include "dm/dm.h"
 #include "dm/gfx.h"
+#include "dm/dungeonman.h"
 
 namespace DM {
 
@@ -39,19 +40,25 @@ DMEngine::~DMEngine() {
 	delete _rnd;
 	delete _console;
 	delete _displayMan;
+	delete _dungeonMan;
 
 	// clear debug channels
 	DebugMan.clearAllDebugChannels();
 }
 
+
 Common::Error DMEngine::run() {
 	initGraphics(320, 200, false);
 	_console = new Console(this);
 	_displayMan = new DisplayMan(this);
+	_dungeonMan = new DungeonMan(this);
 	_displayMan->setUpScreens(320, 200);
 	_displayMan->loadGraphics();
-	
+	_dungeonMan->loadDungeonFile();
 
+
+
+	
 	byte *palette = new byte[256 * 3];
 	for (int i = 0; i < 16; ++i)
 		palette[i * 3] = palette[i * 3 + 1] = palette[i * 3 + 2] = i * 16;
@@ -67,7 +74,7 @@ Common::Error DMEngine::run() {
 	_system->copyRectToScreen(buffer, 320, 0, 0, 320, 200);
 	_system->updateScreen();
 
-	
+
 	uint16 width = _displayMan->getImageWidth(75);
 	uint16 height = _displayMan->getImageHeight(75);
 	byte *cleanByteImg0Data = new byte[width * height];
@@ -77,8 +84,7 @@ Common::Error DMEngine::run() {
 
 	while (true) {
 		_displayMan->updateScreen();
-	}
-
+	}	
 
 	return Common::kNoError;
 }
