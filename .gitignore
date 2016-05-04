@@ -197,5 +197,5 @@ ScummVM.includes
 dists/msvc*/**
 !dists/msvc*/create_project.bat
 
-#Ignroe MS Visual C++ VC.db file
+#Ignore MS Visual C++ VC.db file
 devtools/create_project/msvc*/create_project.VC.db

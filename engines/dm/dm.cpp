@@ -27,7 +27,7 @@ DMEngine::DMEngine(OSystem *syst) : Engine(syst), _console(nullptr) {
 	//SearchMan.addSubDirectoryMatching(gameDataDir, "example2");
 	DebugMan.addDebugChannel(kDMDebugExample, "example", "example desc");
 
-	// regiser random source
+	// register random source
 	_rnd = new Common::RandomSource("quux");
 
 	debug("DMEngine::DMEngine");
@@ -58,7 +58,7 @@ Common::Error DMEngine::run() {
 
 
 
-	
+
 	byte *palette = new byte[256 * 3];
 	for (int i = 0; i < 16; ++i)
 		palette[i * 3] = palette[i * 3 + 1] = palette[i * 3 + 2] = i * 16;
@@ -84,7 +84,7 @@ Common::Error DMEngine::run() {
 
 	while (true) {
 		_displayMan->updateScreen();
-	}	
+	}
 
 
 	delete[] buffer;
