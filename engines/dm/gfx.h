@@ -93,6 +93,10 @@ class DisplayMan {
 	// the last two pointers are owned by this array
 	byte *_wallSetBitMaps[15] = {NULL};	// @G[0696..0710]_puc_Bitmap_WallSet_...
 
+	// only [7-11] is used, indexing convenience
+	byte *_wallSetBitMapsNative[12] = {NULL}; // @G[0095..0099]_puc_Bitmap_Wall...
+	byte *_wallSetBitMapsFlipped[12] = {NULL}; // @G[0090..0094]_puc_Bitmap_Wall...
+
 	// pointers are not owned by these fields
 	byte *_floorBitmap = NULL;
 	byte *_ceilingBitmap = NULL;
@@ -116,7 +120,7 @@ class DisplayMan {
 	void loadFloorSet(FloorSet set); // @ F0094_DUNGEONVIEW_LoadFloorSet
 
 	void applyCreatureReplColors(int replacedColor, int replacementColor); // @ F0093_DUNGEONVIEW_ApplyCreatureReplacementColors
-	
+
 public:
 	DisplayMan(DMEngine *dmEngine);
 	~DisplayMan();
