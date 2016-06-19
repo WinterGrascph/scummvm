@@ -48,7 +48,7 @@ uint16 gSlotMasks[38] = {  // @ G0038_ai_Graphic562_SlotMasks
 	0x0400,   /* Chest 7          Chest */
 	0x0400}; /* Chest 8          Chest */
 
-Box gBoxChampionPortrait = {0, 31, 0, 28}; // @ G0047_s_Graphic562_Box_ChampionPortrait 
+Box gBoxChampionPortrait = Box(0, 31, 0, 28); // @ G0047_s_Graphic562_Box_ChampionPortrait 
 
 ChampionMan::ChampionMan(DMEngine *vm) : _vm(vm) {
 	_leaderIndex = kChampionNone;
@@ -81,7 +81,7 @@ ChampionIndex ChampionMan::getIndexInCell(ViewCell cell) {
 
 void ChampionMan::resetDataToStartGame() {
 	if (!_vm->_dungeonMan->_messages._newGame) {
-		warning("MISSING CODE: stuff for reeseting for loaded games");
+		warning("MISSING CODE: stuff for resetting for loaded games");
 		assert(false);
 	}
 
