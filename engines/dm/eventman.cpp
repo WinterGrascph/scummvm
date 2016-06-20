@@ -380,8 +380,8 @@ void EventManager::processCommandQueue() {
 		CurrMapData &currMap = dunMan._currMap;
 		uint16 mapX = currMap._partyPosX;
 		uint16 mapY = currMap._partyPosY;
-		mapX += gDirIntoStepCountEast[currMap._partyDir];
-		mapY += gDirIntoStepCountNorth[currMap._partyDir];
+		mapX += _dirIntoStepCountEast[currMap._partyDir];
+		mapY += _dirIntoStepCountNorth[currMap._partyDir];
 		Thing squareFirstThing = dunMan.getSquareFirstThing(mapX, mapY);
 		Sensor sensor(dunMan.getThingData(squareFirstThing));
 		if (sensor.getType() == kSensorWallChampionPortrait) {

@@ -169,12 +169,41 @@ void ChampionMan::addCandidateChampionToParty(uint16 championPortraitIndex) {
 		character_Green += 2;
 	}
 
-	champ->setStatistic(kChampionStatLuck, kChampionStatMinimum, 10);	character_Green++;	int16 AL_0_skillIndex;	int16 AL_2_skillValue;	for (AL_0_skillIndex = kChampionSkillSwing; AL_0_skillIndex <= kChampionSkillWater; AL_0_skillIndex++) {		if ((AL_2_skillValue = *character_Green++ - 'A') > 0) {			champ->setSkillExp((ChampionSkill)AL_0_skillIndex, 125L << AL_2_skillValue);		}	}	for (AL_0_skillIndex = kChampionSkillFighter; AL_0_skillIndex <= kChampionSkillWizard; ++AL_0_skillIndex) {		int32 baseSkillExp = 0;		int16 hiddenSkillIndex = (AL_0_skillIndex + 1) << 2;		for (uint16 AL_4_hiddenSkillCounter = 0; AL_4_hiddenSkillCounter < 4; ++AL_4_hiddenSkillCounter) {			baseSkillExp += champ->getSkill((ChampionSkill)(hiddenSkillIndex + AL_4_hiddenSkillCounter))._experience;		}		champ->setSkillExp((ChampionSkill)AL_0_skillIndex, baseSkillExp);	}	_candidateChampionOrdinal = prevChampCount + 1;	if (++_partyChampionCount == 1) {		_vm->_eventMan->commandSetLeader(kChampionFirst);		_vm->_menuMan->_shouldRefreshActionArea = true;	} else {		_vm->_menuMan->clearActingChampion();		_vm->_menuMan->drawActionIcon((ChampionIndex)(_partyChampionCount - 1));	}	int16 mapX = _vm->_dungeonMan->_currMap._partyPosX;
+	champ->setStatistic(kChampionStatLuck, kChampionStatMinimum, 10);
+	character_Green++;
+
+	int16 AL_0_skillIndex;
+	int16 AL_2_skillValue;
+	for (AL_0_skillIndex = kChampionSkillSwing; AL_0_skillIndex <= kChampionSkillWater; AL_0_skillIndex++) {
+		if ((AL_2_skillValue = *character_Green++ - 'A') > 0) {
+			champ->setSkillExp((ChampionSkill)AL_0_skillIndex, 125L << AL_2_skillValue);
+		}
+	}
+
+	for (AL_0_skillIndex = kChampionSkillFighter; AL_0_skillIndex <= kChampionSkillWizard; ++AL_0_skillIndex) {
+		int32 baseSkillExp = 0;
+		int16 hiddenSkillIndex = (AL_0_skillIndex + 1) << 2;
+		for (uint16 AL_4_hiddenSkillCounter = 0; AL_4_hiddenSkillCounter < 4; ++AL_4_hiddenSkillCounter) {
+			baseSkillExp += champ->getSkill((ChampionSkill)(hiddenSkillIndex + AL_4_hiddenSkillCounter))._experience;
+		}
+		champ->setSkillExp((ChampionSkill)AL_0_skillIndex, baseSkillExp);
+	}
+
+	_candidateChampionOrdinal = prevChampCount + 1;
+	if (++_partyChampionCount == 1) {
+		_vm->_eventMan->commandSetLeader(kChampionFirst);
+		_vm->_menuMan->_shouldRefreshActionArea = true;
+	} else {
+		_vm->_menuMan->clearActingChampion();
+		_vm->_menuMan->drawActionIcon((ChampionIndex)(_partyChampionCount - 1));
+	}
+
+	int16 mapX = _vm->_dungeonMan->_currMap._partyPosX;
 	int16 mapY = _vm->_dungeonMan->_currMap._partyPosY;
 
 	uint16 championObjectsCell = returnOppositeDir((direction)(dunMan._currMap._partyDir));
-	mapX += gDirIntoStepCountEast[dunMan._currMap._partyDir];
-	mapY += gDirIntoStepCountNorth[dunMan._currMap._partyDir];
+	mapX += _dirIntoStepCountEast[dunMan._currMap._partyDir];
+	mapY += _dirIntoStepCountNorth[dunMan._currMap._partyDir];
 	thing = dunMan.getSquareFirstThing(mapX, mapY);
 	AL_0_slotIndex_Red = kChampionSlotBackpackLine_1_1;
 	uint16 slotIndex_Green;
