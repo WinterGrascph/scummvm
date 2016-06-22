@@ -727,7 +727,7 @@ Square DungeonMan::getSquare(int16 mapX, int16 mapY) {
 	bool isInYBounds = (mapY >= 0) && (mapY < _currMap._height);
 
 	if (isInXBounds && isInYBounds)
-		return _currMap._data[mapX][mapY];
+		return Square(_currMap._data[mapX][mapY]);
 
 
 	Square tmpSquare;
@@ -746,7 +746,7 @@ Square DungeonMan::getSquare(int16 mapX, int16 mapY) {
 
 		tmpSquare.set(_currMap._data[mapX][_currMap._height - 1]);
 		if (mapY == _currMap._height && (tmpSquare.getType() == kCorridorElemType || tmpSquare.getType() == kPitElemType))
-			return (kWallElemType << 5) | kWallNorthRandOrnAllowed;
+			return Square((kWallElemType << 5) | kWallNorthRandOrnAllowed);
 	}
 
 	return Square(kWallElemType);
@@ -865,7 +865,7 @@ T0172010_ClosedFakeWall:
 		}
 		aspectArray[kWallElemType] = kCorridorElemType;
 		footPrintsAllowed = square.get(kFakeWallRandOrnOrFootPAllowed);
-		square = footPrintsAllowed ? 8 : 0;
+		square = Square(footPrintsAllowed ? 8 : 0);
 		// intentional fallthrough
 	case kCorridorElemType:
 		aspectArray[kFloorOrnOrdAspect] = getRandomOrnOrdinal(square.get(kCorridorRandOrnAllowed), _currMap._map->_randFloorOrnCount, mapX, mapY, 30);
@@ -948,7 +948,7 @@ uint16 *DungeonMan::getThingData(Thing thing) {
 }
 
 Thing DungeonMan::getNextThing(Thing thing) {
-	return getThingData(thing)[0]; // :)
+	return Thing(getThingData(thing)[0]); // :)
 }
 
 char gMessageAndScrollEscReplacementStrings[32][8] = { // @ G0255_aac_Graphic559_MessageAndScrollEscapeReplacementStrings
@@ -1154,7 +1154,7 @@ uint16 DungeonMan::getObjectWeight(Thing thing) {
 	case kArmourThingType:
 		return gArmourInfo[Armour(getThingData(thing)).getType()]._weight;
 	case kJunkThingType: {
-		Junk junk = getThingData(thing);
+		Junk junk(getThingData(thing));
 		uint16 weight = junkInfo[junk.getType()];
 		if (junk.getType() == kJunkTypeWaterskin)
 			weight += junk.getChargeCount() * 2;
@@ -1162,7 +1162,7 @@ uint16 DungeonMan::getObjectWeight(Thing thing) {
 	}
 	case kContainerThingType: {
 		uint16 weight = 50;
-		Container container = getThingData(thing);
+		Container container(getThingData(thing));
 		Thing slotThing = container.getNextContainedThing();
 		while (slotThing != Thing::_thingEndOfList) {
 			weight += getObjectWeight(slotThing);

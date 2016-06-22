@@ -62,6 +62,11 @@ Box gBoxChampionPortrait = Box(0, 31, 0, 28); // @ G0047_s_Graphic562_Box_Champi
 
 ChampionMan::ChampionMan(DMEngine *vm) : _vm(vm) {
 	_leaderIndex = kChampionNone;
+
+	_partyDead = false;
+	_partyIsSleeping = false;
+	_leaderHandObjectIconIndex = kIconIndiceNone;
+	_leaderEmptyHanded = true;
 }
 
 uint16 ChampionMan::getChampionPortraitX(uint16 index) {
@@ -526,8 +531,8 @@ T0292042_green:
 	warning("MISSING CODE: F0078_MOUSE_ShowPointer");
 }
 
-	uint16 ChampionMan::championIconIndex(int16 val, direction dir)
-	{
-		return ((val + 4 - dir) & 0x3);
-	}
+uint16 ChampionMan::championIconIndex(int16 val, direction dir) {
+	return ((val + 4 - dir) & 0x3);
+}
+
 }
