@@ -48,6 +48,7 @@
 #include "objectman.h"
 #include "inventory.h"
 #include "text.h"
+#include "movesens.h"
 
 namespace DM {
 
@@ -83,6 +84,7 @@ DMEngine::DMEngine(OSystem *syst) : Engine(syst), _console(nullptr) {
 	_objectMan = nullptr;
 	_inventoryMan = nullptr;
 	_textMan = nullptr;
+	_movsens = nullptr;
 	_stopWaitingForPlayerInput = false;
 	_gameTimeTicking = false;
 	_restartGameAllowed = false;
@@ -110,6 +112,7 @@ DMEngine::~DMEngine() {
 	delete _objectMan;
 	delete _inventoryMan;
 	delete _textMan;
+	delete _movsens;
 
 	// clear debug channels
 	DebugMan.clearAllDebugChannels();
@@ -188,6 +191,7 @@ Common::Error DMEngine::run() {
 	_objectMan = new ObjectMan(this);
 	_inventoryMan = new InventoryMan(this);
 	_textMan = new TextMan(this);
+	_movsens = new MovesensMan(this);
 	_displayMan->setUpScreens(320, 200);
 
 	initializeGame(); // @ F0463_START_InitializeGame_CPSADEF
