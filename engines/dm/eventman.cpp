@@ -340,6 +340,8 @@ void EventManager::processInput() {
 				if (_dummyMapIndex > 0)
 					dungeonMan.setCurrentMapAndPartyMap(--_dummyMapIndex);
 				break;
+			default:
+				break;
 			}
 		case Common::EVENT_MOUSEMOVE:
 			_mousePos = event.mouse;
@@ -349,6 +351,8 @@ void EventManager::processInput() {
 			_pendingClickPresent = true;
 			_pendingClickPos = _mousePos;
 			_pendingClickButton = (event.type == Common::EVENT_LBUTTONDOWN) ? kLeftMouseButton : kRightMouseButton;
+			break;
+		default:
 			break;
 		}
 	}
@@ -471,6 +475,8 @@ void EventManager::commandMoveParty(CommandType cmdType) {
 	case kCommandMoveRight:
 		dungeonMan.mapCoordsAfterRelMovement(dungeonMan._currMap._partyDir, 0, 1, currMap._partyPosX, currMap._partyPosY);
 		break;
+	default:
+		break;
 	}
 
 	// MISSING CODE: Lots of code
@@ -499,7 +505,7 @@ void EventManager::commandSetLeader(ChampionIndex champIndex) {
 	Champion *champion = &cm._champions[cm._leaderIndex];
 	champion->_dir = _vm->_dungeonMan->_currMap._partyDir;
 	cm._champions[champIndex]._load += _vm->_dungeonMan->getObjectWeight(cm._leaderHand);
-	if (indexToOrdinal(champIndex) != cm._candidateChampionOrdinal) {
+	if (_vm->indexToOrdinal(champIndex) != cm._candidateChampionOrdinal) {
 		champion->setAttributeFlag(kChampionAttributeIcon, true);
 		champion->setAttributeFlag(kChampionAttributeNameTitle, true);
 		cm.drawChampionState(champIndex);

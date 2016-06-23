@@ -359,10 +359,6 @@ CreatureInfo gCreatureInfo[kCreatureTypeCount] = { // @ G0243_as_Graphic559_Crea
 	{25,  0, 0x38AA, 0x0000,  12, 22, 255, 180, 210,   0, 130, 0x6369, 0xFF37, 0x0FBF, 0x0564, 0xFB52, 5},
 	{26,  0, 0x38AA, 0x0000,  12, 22, 255, 180, 210,   0, 130, 0x6369, 0xFF37, 0x0FBF, 0x0564, 0xFB52, 5}};
 
-int16 DM::ordinalToIndex(int16 val) { return val - 1; }
-int16 DM::indexToOrdinal(int16 val) { return val + 1; }
-
-
 void DungeonMan::mapCoordsAfterRelMovement(direction dir, int16 stepsForward, int16 stepsRight, int16 &posX, int16 &posY) {
 	posX += _dirIntoStepCountEast[dir] * stepsForward;
 	posY += _dirIntoStepCountNorth[dir] * stepsForward;
@@ -846,6 +842,8 @@ void DungeonMan::setSquareAspect(uint16 *aspectArray, direction dir, int16 mapX,
 			frontOrnAllowed = square.get(kWallEastRandOrnAllowed);
 			rightOrnAllowed = square.get(kWallSouthRandOrnAllowed);
 			break;
+		default:
+			break;
 		}
 
 T0172010_ClosedFakeWall:
@@ -863,7 +861,7 @@ T0172010_ClosedFakeWall:
 					Sensor sensor(getThingData(thing));
 					aspectArray[sideIndex + 1] = sensor.getOrnOrdinal();
 					if (sensor.getType() == kSensorWallChampionPortrait) {
-						_vm->_displayMan->_championPortraitOrdinal = indexToOrdinal(sensor.getData());
+						_vm->_displayMan->_championPortraitOrdinal = _vm->indexToOrdinal(sensor.getData());
 					}
 				}
 			}
@@ -929,6 +927,9 @@ T0172049_Footprints:
 		unsigned char scentOrdinal; // see next line comment
 		if (footPrintsAllowed) // TODO: I skipped some party query code, must come back later and complete
 			aspectArray[kFloorOrnOrdAspect] &= kFootprintsAspect;
+		break;
+	default:
+		break;
 	}
 	aspectArray[kFirstGroupOrObjectAspect] = thing.toUint16();
 }
@@ -946,7 +947,7 @@ void DungeonMan::setSquareAspectOrnOrdinals(uint16 *aspectArray, bool leftAllowe
 
 	if (isFakeWall || mapX < 0 || mapX >= _currMap._width || mapY < 0 || mapY >= _currMap._height) {
 		for (uint16 i = kRightWallOrnOrdAspect; i <= kLeftWallOrnOrdAspect; ++i) {
-			if (isWallOrnAnAlcove(ordinalToIndex(aspectArray[i])))
+			if (isWallOrnAnAlcove(_vm->ordinalToIndex(aspectArray[i])))
 				aspectArray[i] = 0;
 		}
 	}
@@ -957,7 +958,7 @@ int16 DungeonMan::getRandomOrnOrdinal(bool allowed, int16 count, int16 mapX, int
 					+ (3000 + (_currMap._index << 6) + _currMap._width + _currMap._height) * 11
 					+ _fileHeader._ornamentRandomSeed) >> 2) % modulo;
 	if (allowed && index < count)
-		return indexToOrdinal(index);
+		return _vm->indexToOrdinal(index);
 	return 0;
 }
 
@@ -1209,6 +1210,8 @@ uint16 DungeonMan::getObjectWeight(Thing thing) {
 		}
 	case kScrollThingType:
 		return 1;
+	default:
+		break;
 	}
 
 	assert(false); // this should never be taken
