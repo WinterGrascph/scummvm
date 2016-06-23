@@ -231,4 +231,12 @@ void DMEngine::gameloop() {
 	}
 }
 
+int16 DMEngine::ordinalToIndex(int16 val) {
+	return val - 1;
+}
+
+int16 DMEngine::indexToOrdinal(int16 val) {
+	return val + 1;
+}
+
 } // End of namespace DM
