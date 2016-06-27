@@ -1195,7 +1195,7 @@ uint16 DungeonMan::getObjectWeight(Thing thing) {
 	case kContainerThingType: {
 		uint16 weight = 50;
 		Container container(getThingData(thing));
-		Thing slotThing = container.getNextContainedThing();
+		Thing slotThing = container.getSlot();
 		while (slotThing != Thing::_thingEndOfList) {
 			weight += getObjectWeight(slotThing);
 			slotThing = getNextThing(slotThing);
