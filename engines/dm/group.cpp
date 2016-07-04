@@ -36,6 +36,7 @@ namespace DM {
 
 GroupMan::GroupMan(DMEngine* vm) : _vm(vm) {
 	_g375_activeGroups = nullptr;
+	_g376_maxActiveGroupCount = 60;
 }
 
 GroupMan::~GroupMan() {
