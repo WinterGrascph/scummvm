@@ -948,12 +948,12 @@ T0172030_Pit:
 		aspectArray[k2_TeleporterVisibleAspect] = getFlag(square, k0x0008_TeleporterOpen) && getFlag(square, k0x0004_TeleporterVisible);
 		goto T0172029_Teleporter;
 	case k3_ElementTypeStairs:
-		aspectArray[k0_ElemAspect] = (((getFlag(square, k0x0008_StairsNorthSouthOrient) >> 3) ? true : false) == isOrientedWestEast(dir)) ? k18_ElementTypeStairsSide : k19_ElementTypeStaisFront;
+		aspectArray[k0_ElemAspect] = ((getFlag(square, k0x0008_StairsNorthSouthOrient) >> 3) == (isOrientedWestEast(dir) ? 1 : 0)) ? k18_ElementTypeStairsSide : k19_ElementTypeStaisFront;
 		aspectArray[k2_StairsUpAspect] = getFlag(square, k0x0004_StairsUp);
 		footprintsAllowed = false;
 		goto T0172046_Stairs;
 	case k4_DoorElemType:
-		if (((getFlag(square, k0x0008_DoorNorthSouthOrient) >> 3) ? true : false) == isOrientedWestEast(dir)) {
+		if ((getFlag(square, k0x0008_DoorNorthSouthOrient) >> 3) == (isOrientedWestEast(dir) ? 1 : 0)) {
 			aspectArray[k0_ElemAspect] = k16_DoorSideElemType;
 		} else {
 			aspectArray[k0_ElemAspect] = k17_DoorFrontElemType;

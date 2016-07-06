@@ -41,6 +41,7 @@ int32 M32_setTime(int32 &map_time, int32 time) {
 GroupMan::GroupMan(DMEngine* vm) : _vm(vm) {
 	_g375_activeGroups = nullptr;
 	_g377_currActiveGroupCount = 0;
+	_g376_maxActiveGroupCount = 60;
 }
 
 GroupMan::~GroupMan() {
