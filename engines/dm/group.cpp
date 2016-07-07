@@ -39,9 +39,27 @@ int32 M32_setTime(int32 &map_time, int32 time) {
 }
 
 GroupMan::GroupMan(DMEngine* vm) : _vm(vm) {
+	for (uint16 i = 0; i < 4; ++i)
+		_g392_dropMovingCreatureFixedPossessionsCell[i] = 0;
+	_g391_dropMovingCreatureFixedPossCellCount = 0;
+	_g386_fluxCageCount = 0;
+	for (uint16 i = 0; i < 4; ++i)
+		_g385_fluxCages[i] = 0;
+	_g378_currentGroupMapX = 0;
+	_g379_currentGroupMapY = 0;
+	_g380_currGroupThing = Thing(0);
+	for (uint16 i = 0; i < 4; ++i)
+		_g384_groupMovementTestedDirections[i] = 0;
+	_g381_currGroupDistanceToParty = 0;
+	_g382_currGroupPrimaryDirToParty = 0;
+	_g383_currGroupSecondaryDirToParty = 0;
+	_g388_groupMovementBlockedByGroupThing = Thing(0);
+	_g389_groupMovementBlockedByDoor = false;
+	_g390_groupMovementBlockedByParty = false;
+	_g387_groupMovBlockedByWallStairsPitFakeWalFluxCageTeleporter = false;
+	_g376_maxActiveGroupCount = 60;
 	_g375_activeGroups = nullptr;
 	_g377_currActiveGroupCount = 0;
-	_g376_maxActiveGroupCount = 60;
 }
 
 GroupMan::~GroupMan() {
@@ -1732,5 +1750,40 @@ void GroupMan::f184_removeActiveGroup(uint16 activeGroupIndex) {
 		L0348_ps_Group->setBehaviour(k0_behavior_WANDER);
 	}
 	L0347_ps_ActiveGroup->_groupThingIndex = -1;
+}
+
+void GroupMan::f194_removeAllActiveGroups() {
+	for (int16 L0397_ui_ActiveGroupIndex = 0; _g377_currActiveGroupCount > 0; L0397_ui_ActiveGroupIndex++) {
+		if (_vm->_groupMan->_g375_activeGroups[L0397_ui_ActiveGroupIndex]._groupThingIndex >= 0) {
+			f184_removeActiveGroup(L0397_ui_ActiveGroupIndex);
+		}
+	}
+}
+
+void GroupMan::f195_addAllActiveGroups() {
+	uint16 L0398_ui_MapX;
+	uint16 L0399_ui_MapY;
+	Thing L0400_T_Thing;
+	byte* L0401_puc_Square;
+	Thing* L0402_pT_SquareFirstThing;
+
+
+	L0401_puc_Square = _vm->_dungeonMan->_g271_currMapData[0];
+	L0402_pT_SquareFirstThing = &_vm->_dungeonMan->_g283_squareFirstThings[_vm->_dungeonMan->_g270_currMapColCumulativeSquareFirstThingCount[0]];
+	for (L0398_ui_MapX = 0; L0398_ui_MapX < _vm->_dungeonMan->_g273_currMapWidth; L0398_ui_MapX++) {
+		for (L0399_ui_MapY = 0; L0399_ui_MapY < _vm->_dungeonMan->_g274_currMapHeight; L0399_ui_MapY++) {
+			if (getFlag(*L0401_puc_Square++, k0x0010_ThingListPresent)) {
+				L0400_T_Thing = *L0402_pT_SquareFirstThing++;
+				do {
+					if (L0400_T_Thing.getType() == k4_GroupThingType) {
+						f181_groupDeleteEvents(L0398_ui_MapX, L0399_ui_MapY);
+						f183_addActiveGroup(L0400_T_Thing, L0398_ui_MapX, L0399_ui_MapY);
+						f180_startWanedring(L0398_ui_MapX, L0399_ui_MapY);
+						break;
+					}
+				} while ((L0400_T_Thing = _vm->_dungeonMan->f159_getNextThing(L0400_T_Thing)) != Thing::_endOfList);
+			}
+		}
+	}
 }
 }
