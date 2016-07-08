@@ -1119,10 +1119,10 @@ char g257_InscriptionEscReplacementStrings[32][8] = { // @ G0257_aac_Graphic559_
 
 
 void DungeonMan::f168_decodeText(char *destString, Thing thing, TextType type) {
-	char sepChar;
 	TextString textString(_g284_thingData[k2_TextstringType] + thing.getIndex() * g235_ThingDataWordCount[k2_TextstringType]);
 	if ((textString.isVisible()) || (type & k0x8000_DecodeEvenIfInvisible)) {
 		type = (TextType)(type & ~k0x8000_DecodeEvenIfInvisible);
+		char sepChar;
 		if (type == k1_TextTypeMessage) {
 			*destString++ = '\n';
 			sepChar = ' ';

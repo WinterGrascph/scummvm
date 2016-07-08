@@ -229,8 +229,8 @@ void ChampionMan::f299_applyModifiersToStatistics(Champion* champ, int16 slotInd
 	if (((thingType == k5_WeaponThingType) || (thingType == k6_ArmourThingType))
 		&& (slotIndex >= k0_ChampionSlotReadyHand)
 		&& (slotIndex <= k12_ChampionSlotQuiverLine_1_1)) {
-		Weapon *weapon = (Weapon*)_vm->_dungeonMan->f156_getThingData(thing);
-		Armour *armour = (Armour*)_vm->_dungeonMan->f156_getThingData(thing);
+		Weapon *weapon = (Weapon *)_vm->_dungeonMan->f156_getThingData(thing);
+		Armour *armour = (Armour *)_vm->_dungeonMan->f156_getThingData(thing);
 		if (((thingType == k5_WeaponThingType) && weapon->getCursed())
 			|| ((thingType == k6_ArmourThingType) && armour->getCursed())) {
 			statIndex = k0_ChampionStatLuck;
@@ -477,13 +477,13 @@ void ChampionMan::f301_addObjectInSlot(ChampionIndex champIndex, Thing thing, Ch
 				menuMan.f388_clearActingChampion();
 
 			if ((iconIndex >= k30_IconIndiceScrollOpen) && (iconIndex <= k31_IconIndiceScrollClosed)) {
-				((Scroll*)rawObjPtr)->setClosed(false);
+				((Scroll *)rawObjPtr)->setClosed(false);
 				f296_drawChangedObjectIcons();
 			}
 		}
 
 		if (iconIndex = k4_IconIndiceWeaponTorchUnlit) {
-			((Weapon*)rawObjPtr)->setLit(true);
+			((Weapon *)rawObjPtr)->setLit(true);
 			_vm->_inventoryMan->f337_setDungeonViewPalette();
 			f296_drawChangedObjectIcons();
 		} else if (isInventoryChampion && (slotIndex == k1_ChampionSlotActionHand) &&
@@ -494,12 +494,12 @@ void ChampionMan::f301_addObjectInSlot(ChampionIndex champIndex, Thing thing, Ch
 	} else if (slotIndex == k10_ChampionSlotNeck) {
 
 		if ((iconIndex >= k12_IconIndiceJunkIllumuletUnequipped) && (iconIndex <= k13_IconIndiceJunkIllumuletEquipped)) {
-			((Junk*)rawObjPtr)->setChargeCount(1);
+			((Junk *)rawObjPtr)->setChargeCount(1);
 			_g407_party._magicalLightAmount += g39_LightPowerToLightAmount[2];
 			_vm->_inventoryMan->f337_setDungeonViewPalette();
 			iconIndex = (IconIndice)(iconIndex + 1);
 		} else if ((iconIndex >= k10_IconIndiceJunkJewelSymalUnequipped) && (iconIndex <= k11_IconIndiceJunkJewelSymalEquipped)) {
-			((Junk*)rawObjPtr)->setChargeCount(1);
+			((Junk *)rawObjPtr)->setChargeCount(1);
 			iconIndex = (IconIndice)(iconIndex + 1);
 		}
 
@@ -511,18 +511,15 @@ void ChampionMan::f301_addObjectInSlot(ChampionIndex champIndex, Thing thing, Ch
 }
 
 int16 ChampionMan::f315_getScentOrdinal(int16 mapX, int16 mapY) {
-	uint16 searchedScentRedEagle;
-	int16 scentIndex;
-	Scent* scent;
-	Scent searchedScent;
+	int16 scentIndex = _g407_party._scentCount;
 
-
-	if (scentIndex = _g407_party._scentCount) {
+	if (scentIndex) {
+		Scent searchedScent;
 		searchedScent.setMapX(mapX);
 		searchedScent.setMapY(mapY);
 		searchedScent.setMapIndex(_vm->_dungeonMan->_g272_currMapIndex);
-		searchedScentRedEagle = searchedScent.toUint16();
-		scent = &_g407_party._scents[scentIndex--];
+		uint16 searchedScentRedEagle = searchedScent.toUint16();
+		Scent* scent = &_g407_party._scents[scentIndex--];
 		do {
 			if ((*(--scent)).toUint16() == searchedScentRedEagle) {
 				return _vm->M0_indexToOrdinal(scentIndex);
@@ -625,15 +622,15 @@ Thing ChampionMan::f300_getObjectRemovedFromSlot(uint16 champIndex, uint16 slotI
 	L0898_B_IsInventoryChampion = (_vm->M0_indexToOrdinal(champIndex) == _vm->_inventoryMan->_g432_inventoryChampionOrdinal);
 	L0895_i_IconIndex = _vm->_objectMan->f33_getIconIndex(L0894_T_Thing);
 	f299_applyModifiersToStatistics(L0896_ps_Champion, slotIndex, L0895_i_IconIndex, -1, L0894_T_Thing); /* Remove objet modifiers */
-	L0897_ps_Weapon = (Weapon*)_vm->_dungeonMan->f156_getThingData(L0894_T_Thing);
+	L0897_ps_Weapon = (Weapon *)_vm->_dungeonMan->f156_getThingData(L0894_T_Thing);
 	if (slotIndex == k10_ChampionSlotNeck) {
 		if ((L0895_i_IconIndex >= k12_IconIndiceJunkIllumuletUnequipped) && (L0895_i_IconIndex <= k13_IconIndiceJunkIllumuletEquipped)) {
-			((Junk*)L0897_ps_Weapon)->setChargeCount(0);
+			((Junk *)L0897_ps_Weapon)->setChargeCount(0);
 			_g407_party._magicalLightAmount -= g39_LightPowerToLightAmount[2];
 			_vm->_inventoryMan->f337_setDungeonViewPalette();
 		} else {
 			if ((L0895_i_IconIndex >= k10_IconIndiceJunkJewelSymalUnequipped) && (L0895_i_IconIndex <= k11_IconIndiceJunkJewelSymalEquipped)) {
-				((Junk*)L0897_ps_Weapon)->setChargeCount(0);
+				((Junk *)L0897_ps_Weapon)->setChargeCount(0);
 			}
 		}
 	}
@@ -648,7 +645,7 @@ Thing ChampionMan::f300_getObjectRemovedFromSlot(uint16 champIndex, uint16 slotI
 				_vm->_menuMan->f388_clearActingChampion();
 			}
 			if ((L0895_i_IconIndex >= k30_IconIndiceScrollOpen) && (L0895_i_IconIndex <= k31_IconIndiceScrollClosed)) {
-				((Scroll*)L0897_ps_Weapon)->setClosed(true);
+				((Scroll *)L0897_ps_Weapon)->setClosed(true);
 				f296_drawChangedObjectIcons();
 			}
 		}
@@ -755,7 +752,7 @@ T0321024:
 			goto T0321004;
 		if (attack > (AL0976_i_AdjustedAttack = f307_getStatisticAdjustedAttack(L0979_ps_Champion, k4_ChampionStatVitality, _vm->_rnd->getRandomNumber(127) + 10))) { /* BUG0_45 This bug is not perceptible because of BUG0_41 that ignores Vitality while determining the probability of being wounded. However if it was fixed, the behavior would be the opposite of what it should: the higher the vitality of a champion, the lower the result of F0307_CHAMPION_GetStatisticAdjustedAttack and the more likely the champion could get wounded (because of more iterations in the loop below) */
 			do {
-				setFlag(*(uint16*)&_g410_championPendingWounds[champIndex], (1 << _vm->_rnd->getRandomNumber(7)) & allowedWounds);
+				setFlag(*(uint16 *)&_g410_championPendingWounds[champIndex], (1 << _vm->_rnd->getRandomNumber(7)) & allowedWounds);
 			} while ((attack > (AL0976_i_AdjustedAttack <<= 1)) && AL0976_i_AdjustedAttack);
 		}
 		if (_g300_partyIsSleeping) {
@@ -785,8 +782,8 @@ int16 ChampionMan::f313_getWoundDefense(int16 champIndex, uint16 woundIndex) {
 	}
 	for (L0943_ui_ArmourShieldDefense = 0, AL0942_i_SlotIndex = k0_ChampionSlotReadyHand; AL0942_i_SlotIndex <= k1_ChampionSlotActionHand; AL0942_i_SlotIndex++) {
 		if ((L0945_T_Thing = L0946_ps_Champion->_slots[AL0942_i_SlotIndex]).getType() == k6_ArmourThingType) {
-			L0947_ps_ArmourInfo = (ArmourInfo*)_vm->_dungeonMan->f156_getThingData(L0945_T_Thing);
-			L0947_ps_ArmourInfo = &g239_ArmourInfo[((Armour*)L0947_ps_ArmourInfo)->getType()];
+			L0947_ps_ArmourInfo = (ArmourInfo *)_vm->_dungeonMan->f156_getThingData(L0945_T_Thing);
+			L0947_ps_ArmourInfo = &g239_ArmourInfo[((Armour *)L0947_ps_ArmourInfo)->getType()];
 			if (getFlag(L0947_ps_ArmourInfo->_attributes, k0x0080_ArmourAttributeIsAShield)) {
 				L0943_ui_ArmourShieldDefense += ((f312_getStrength(champIndex, AL0942_i_SlotIndex) + _vm->_dungeonMan->f143_getArmourDefense(L0947_ps_ArmourInfo, L0944_B_UseSharpDefense)) * g50_woundDefenseFactor[woundIndex]) >> ((AL0942_i_SlotIndex == woundIndex) ? 4 : 5);
 			}
@@ -798,8 +795,8 @@ int16 ChampionMan::f313_getWoundDefense(int16 champIndex, uint16 woundIndex) {
 	}
 	AL0942_i_WoundDefense += L0946_ps_Champion->_actionDefense + L0946_ps_Champion->_shieldDefense + _g407_party._shieldDefense + L0943_ui_ArmourShieldDefense;
 	if ((woundIndex > k1_ChampionSlotActionHand) && ((L0945_T_Thing = L0946_ps_Champion->_slots[woundIndex]).getType() == k6_ArmourThingType)) {
-		L0947_ps_ArmourInfo = (ArmourInfo*)_vm->_dungeonMan->f156_getThingData(L0945_T_Thing);
-		AL0942_i_WoundDefense += _vm->_dungeonMan->f143_getArmourDefense(&g239_ArmourInfo[((Armour*)L0947_ps_ArmourInfo)->getType()], L0944_B_UseSharpDefense);
+		L0947_ps_ArmourInfo = (ArmourInfo *)_vm->_dungeonMan->f156_getThingData(L0945_T_Thing);
+		AL0942_i_WoundDefense += _vm->_dungeonMan->f143_getArmourDefense(&g239_ArmourInfo[((Armour *)L0947_ps_ArmourInfo)->getType()], L0944_B_UseSharpDefense);
 	}
 	if (getFlag(L0946_ps_Champion->_wounds, 1 << woundIndex)) {
 		AL0942_i_WoundDefense -= 8 + _vm->getRandomNumber(4);
@@ -992,27 +989,20 @@ int16 ChampionMan::f324_damageAll_getDamagedChampionCount(uint16 attack, int16 w
 }
 
 int16 ChampionMan::f286_getTargetChampionIndex(int16 mapX, int16 mapY, uint16 cell) {
-	uint16 L0838_ui_Counter;
-	int16 L0839_i_ChampionIndex;
-	signed char L0840_auc_OrderedCellsToAttack[4];
-
-
 	if (_g305_partyChampionCount && (M38_distance(mapX, mapY, _vm->_dungeonMan->_g306_partyMapX, _vm->_dungeonMan->_g307_partyMapY) <= 1)) {
+		signed char L0840_auc_OrderedCellsToAttack[4];
 		_vm->_groupMan->f229_setOrderedCellsToAttack(L0840_auc_OrderedCellsToAttack, _vm->_dungeonMan->_g306_partyMapX, _vm->_dungeonMan->_g307_partyMapY, mapX, mapY, cell);
-		for (L0838_ui_Counter = 0; L0838_ui_Counter < 4; L0838_ui_Counter++) {
-			if ((L0839_i_ChampionIndex = f285_getIndexInCell(L0840_auc_OrderedCellsToAttack[L0838_ui_Counter])) >= 0) {
+		for (uint16 L0838_ui_Counter = 0; L0838_ui_Counter < 4; L0838_ui_Counter++) {
+			int16 L0839_i_ChampionIndex = f285_getIndexInCell(L0840_auc_OrderedCellsToAttack[L0838_ui_Counter]);
+			if (L0839_i_ChampionIndex >= 0)
 				return L0839_i_ChampionIndex;
-			}
 		}
 	}
 	return kM1_ChampionNone;
 }
 
 int16 ChampionMan::f311_getDexterity(Champion* champ) {
-	int16 L0934_i_Dexterity;
-
-
-	L0934_i_Dexterity = _vm->getRandomNumber(8) + champ->_statistics[k2_ChampionStatDexterity][k1_ChampionStatCurrent];
+	int16 L0934_i_Dexterity = _vm->getRandomNumber(8) + champ->_statistics[k2_ChampionStatDexterity][k1_ChampionStatCurrent];
 	L0934_i_Dexterity -= ((int32)(L0934_i_Dexterity >> 1) * (int32)champ->_load) / f309_getMaximumLoad(champ);
 	if (_g300_partyIsSleeping) {
 		L0934_i_Dexterity >>= 1;
@@ -1022,27 +1012,21 @@ int16 ChampionMan::f311_getDexterity(Champion* champ) {
 
 bool ChampionMan::f308_isLucky(Champion* champ, uint16 percentage) {
 #define AP0646_ui_IsLucky percentage
-	register unsigned char* L0928_puc_Statistic;
-
 
 	if (_vm->getRandomNumber(2) && (_vm->getRandomNumber(100) > percentage)) {
 		return true;
 	}
-	L0928_puc_Statistic = champ->_statistics[k0_ChampionStatLuck];
+	register unsigned char* L0928_puc_Statistic = champ->_statistics[k0_ChampionStatLuck];
 	AP0646_ui_IsLucky = (_vm->getRandomNumber(L0928_puc_Statistic[k1_ChampionStatCurrent]) > percentage);
 	L0928_puc_Statistic[k1_ChampionStatCurrent] = f26_getBoundedValue((int32)L0928_puc_Statistic[k2_ChampionStatMinimum], (int32)L0928_puc_Statistic[k1_ChampionStatCurrent] + (AP0646_ui_IsLucky ? -2 : 2), (int32)L0928_puc_Statistic[k0_ChampionStatMaximum]);
 	return AP0646_ui_IsLucky;
 }
 
 void ChampionMan::f322_championPoison(int16 champIndex, uint16 attack) {
-	TimelineEvent L0980_s_Event;
-	Champion* L0981_ps_Champion;
-
-
-	if ((champIndex == kM1_ChampionNone) || (_vm->M0_indexToOrdinal(champIndex) == _g299_candidateChampionOrdinal)) {
+	if ((champIndex == kM1_ChampionNone) || (_vm->M0_indexToOrdinal(champIndex) == _g299_candidateChampionOrdinal))
 		return;
-	}
-	L0981_ps_Champion = &_gK71_champions[champIndex];
+
+	Champion* L0981_ps_Champion = &_gK71_champions[champIndex];
 	f321_addPendingDamageAndWounds_getDamage(champIndex, MAX(1, attack >> 6), k0x0000_ChampionWoundNone, k0_attackType_NORMAL);
 	setFlag(L0981_ps_Champion->_attributes, k0x0100_ChampionAttributeStatistics);
 	if ((_vm->M0_indexToOrdinal(champIndex) == _vm->_inventoryMan->_g432_inventoryChampionOrdinal) && (_vm->_inventoryMan->_g424_panelContent == k0_PanelContentFoodWaterPoisoned)) {
@@ -1050,6 +1034,7 @@ void ChampionMan::f322_championPoison(int16 champIndex, uint16 attack) {
 	}
 	if (--attack) {
 		L0981_ps_Champion->_poisonEventCount++;
+		TimelineEvent L0980_s_Event;
 		L0980_s_Event._type = k75_TMEventTypePoisonChampion;
 		L0980_s_Event._priority = champIndex;
 		M33_setMapAndTime(L0980_s_Event._mapTime, _vm->_dungeonMan->_g309_partyMapIndex, _vm->_g313_gameTime + 36);
@@ -1099,22 +1084,18 @@ void ChampionMan::f316_deleteScent(uint16 scentIndex) {
 }
 
 void ChampionMan::f317_addScentStrength(int16 mapX, int16 mapY, int32 cycleCount) {
-	int16 L0954_i_ScentIndex;
-	bool L0955_B_Merge;
-	bool L0956_B_CycleCountDefined;
-	Scent* L0957_ps_Scent; /* BUG0_00 Useless code */
-	Scent L0958_s_Scent; /* BUG0_00 Useless code */
-
-
-	if (L0954_i_ScentIndex = _g407_party._scentCount) {
-		if (L0955_B_Merge = getFlag(cycleCount, k0x8000_mergeCycles)) {
+	int16 L0954_i_ScentIndex = _vm->_championMan->_g407_party._scentCount;
+	if (L0954_i_ScentIndex) {
+		bool L0955_B_Merge = getFlag(cycleCount, k0x8000_mergeCycles);
+		if (L0955_B_Merge) {
 			clearFlag(cycleCount, k0x8000_mergeCycles);
 		}
+		Scent L0958_s_Scent; /* BUG0_00 Useless code */
 		L0958_s_Scent.setMapX(mapX); /* BUG0_00 Useless code */
 		L0958_s_Scent.setMapY(mapY); /* BUG0_00 Useless code */
 		L0958_s_Scent.setMapIndex(_vm->_dungeonMan->_g272_currMapIndex); /* BUG0_00 Useless code */
-		L0957_ps_Scent = _g407_party._scents; /* BUG0_00 Useless code */
-		L0956_B_CycleCountDefined = false;
+		Scent* L0957_ps_Scent = _vm->_championMan->_g407_party._scents; /* BUG0_00 Useless code */
+		bool L0956_B_CycleCountDefined = false;
 		while (L0954_i_ScentIndex--) {
 			if (&*L0957_ps_Scent++ == &L0958_s_Scent) {
 				if (!L0956_B_CycleCountDefined) {

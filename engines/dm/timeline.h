@@ -109,7 +109,7 @@ public:
 		int16 _attack;
 		int16 _defense;
 		int16 _lightPower;
-		Thing _slot;
+		uint16 _slot; // Thing
 		int16 _slotOrdinal;
 		B_unionTimelineEvent() {}
 	} _B;
@@ -135,7 +135,7 @@ public:
 			void setStepEnergy(uint16 val) { _backing = (_backing & ~(0xF << 12)) | ((val & 0xF) << 12); }
 		} _projectile;
 
-		Thing _slot;
+		uint16 _slot;
 		int16 _soundIndex;
 		byte _ticks;
 		C_uionTimelineEvent() {}
@@ -151,7 +151,7 @@ public:
 	uint16 *_g371_timeline; // @ G0371_pui_Timeline
 	uint16 _g373_firstUnusedEventIndex; // @ G0373_ui_FirstUnusedEventIndex
 
-	Timeline(DMEngine *vm);
+	explicit Timeline(DMEngine *vm);
 	~Timeline();
 	void f233_initTimeline(); // @ F0233_TIMELINE_Initialize
 	void f237_deleteEvent(uint16 eventIndex);// @ F0237_TIMELINE_DeleteEvent
