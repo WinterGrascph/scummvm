@@ -1313,42 +1313,32 @@ int16 DungeonMan::f141_getObjectInfoIndex(Thing thing) {
 }
 
 void DungeonMan::f163_linkThingToList(Thing thingToLink, Thing thingInList, int16 mapX, int16 mapY) {
-	Thing L0265_T_Thing;
-	uint16 L0266_ui_Multiple;
-#define AL0266_ui_Column                L0266_ui_Multiple
-#define AL0266_ui_SquareFirstThingIndex L0266_ui_Multiple
-	Thing* L0267_pT_Thing;
-	byte* L0268_puc_Square;
-	Thing* L0269_ps_Generic;
-	uint16 L0270_ui_MapY;
-
-
-	if (thingToLink == Thing::_endOfList) {
+	if (thingToLink == Thing::_endOfList)
 		return;
-	}
-	L0269_ps_Generic = (Thing*)f156_getThingData(thingToLink);
+
+	Thing *L0269_ps_Generic = (Thing *)f156_getThingData(thingToLink);
 	*L0269_ps_Generic = Thing::_endOfList;
 	/* If mapX >= 0 then the thing is linked to the list of things on the specified square else it is linked at the end of the specified thing list */
 	if (mapX >= 0) {
-		L0268_puc_Square = &_g271_currMapData[mapX][mapY];
+		byte *L0268_puc_Square = &_g271_currMapData[mapX][mapY];
 		if (getFlag(*L0268_puc_Square, k0x0010_ThingListPresent)) {
 			thingInList = f161_getSquareFirstThing(mapX, mapY);
 		} else {
 			setFlag(*L0268_puc_Square, k0x0010_ThingListPresent);
 			uint16 * tmp = _g270_currMapColCumulativeSquareFirstThingCount + mapX + 1;
-			AL0266_ui_Column = _g282_dungeonColumCount - (_g281_dungeonMapsFirstColumnIndex[_g272_currMapIndex] + mapX) - 1;
+			uint16 AL0266_ui_Column = _g282_dungeonColumCount - (_g281_dungeonMapsFirstColumnIndex[_g272_currMapIndex] + mapX) - 1;
 			while (AL0266_ui_Column--) { /* For each column starting from and after the column containing the square where the thing is added */
 				(*tmp++)++; /* Increment the cumulative first thing count */
 			}
-			L0270_ui_MapY = 0;
+			uint16 L0270_ui_MapY = 0;
 			L0268_puc_Square -= mapY;
-			AL0266_ui_SquareFirstThingIndex = _g270_currMapColCumulativeSquareFirstThingCount[mapX];
+			uint16 AL0266_ui_SquareFirstThingIndex = _g270_currMapColCumulativeSquareFirstThingCount[mapX];
 			while (L0270_ui_MapY++ != mapY) {
 				if (getFlag(*L0268_puc_Square++, k0x0010_ThingListPresent)) {
 					AL0266_ui_SquareFirstThingIndex++;
 				}
 			}
-			L0267_pT_Thing = &_g283_squareFirstThings[AL0266_ui_SquareFirstThingIndex];
+			Thing *L0267_pT_Thing = &_g283_squareFirstThings[AL0266_ui_SquareFirstThingIndex];
 			// the second '- 1' is for the loop initialization, > 0 is because we are copying from one behind
 			for (int16 i = _g278_dungeonFileHeader._squareFirstThingCount - AL0266_ui_SquareFirstThingIndex - 1 - 1; i > 0; --i)
 				L0267_pT_Thing[i] = L0267_pT_Thing[i - 1];
@@ -1357,11 +1347,11 @@ void DungeonMan::f163_linkThingToList(Thing thingToLink, Thing thingInList, int1
 			return;
 		}
 	}
-	L0265_T_Thing = f159_getNextThing(thingInList);
+	Thing L0265_T_Thing = f159_getNextThing(thingInList);
 	while (L0265_T_Thing != Thing::_endOfList) {
 		L0265_T_Thing = f159_getNextThing(thingInList = L0265_T_Thing);
 	}
-	L0269_ps_Generic = (Thing*)f156_getThingData(thingInList);
+	L0269_ps_Generic = (Thing *)f156_getThingData(thingInList);
 	*L0269_ps_Generic = thingToLink;
 }
 
