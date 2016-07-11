@@ -176,8 +176,8 @@ bool ChampionMan::f328_isObjectThrown(uint16 champIndex, int16 slotIndex, int16 
 	AL0994_i_Attack = f26_getBoundedValue((uint16)40, (uint16)((AL0995_i_SkillLevel << 3) + _vm->_rnd->getRandomNumber(31)), (uint16)200);
 	AL0995_i_StepEnergy = MAX(5, 11 - AL0995_i_SkillLevel);
 	_vm->_projexpl->f212_projectileCreate(L0996_T_Thing, _vm->_dungeonMan->_g306_partyMapX, _vm->_dungeonMan->_g307_partyMapY,
-							M21_normalizeModulo4(_vm->_dungeonMan->_g308_partyDir + side),
-							_vm->_dungeonMan->_g308_partyDir, L0993_i_KineticEnergy, AL0994_i_Attack, AL0995_i_StepEnergy);
+										  M21_normalizeModulo4(_vm->_dungeonMan->_g308_partyDir + side),
+										  _vm->_dungeonMan->_g308_partyDir, L0993_i_KineticEnergy, AL0994_i_Attack, AL0995_i_StepEnergy);
 	_vm->_g311_projectileDisableMovementTicks = 4;
 	_vm->_g312_lastProjectileDisabledMovementDirection = _vm->_dungeonMan->_g308_partyDir;
 	f292_drawChampionState((ChampionIndex)champIndex);
@@ -1120,7 +1120,7 @@ void ChampionMan::f297_putObjectInLeaderHand(Thing thing, bool setMousePointer) 
 	_g415_leaderEmptyHanded = false;
 	_vm->_objectMan->f36_extractIconFromBitmap(_g413_leaderHandObjectIconIndex = _vm->_objectMan->f33_getIconIndex(_g414_leaderHandObject = thing), _vm->_objectMan->_g412_objectIconForMousePointer);
 
-	
+
 	_vm->_eventMan->f78_showMouse();
 	_vm->_objectMan->f34_drawLeaderObjectName(thing);
 	if (setMousePointer) {
@@ -1134,6 +1134,33 @@ void ChampionMan::f297_putObjectInLeaderHand(Thing thing, bool setMousePointer) 
 		setFlag(_gK71_champions[_g411_leaderIndex]._attributes, k0x0200_ChampionAttributeLoad);
 		f292_drawChampionState(_g411_leaderIndex);
 	}
+}
+
+int16 ChampionMan::f310_getMovementTicks(Champion* champ) {
+	uint16 L0931_ui_Multiple;
+#define AL0931_ui_Load       L0931_ui_Multiple
+#define AL0931_ui_WoundTicks L0931_ui_Multiple
+	uint16 L0932_ui_MaximumLoad;
+	int16 L0933_i_Ticks;
+
+
+	if ((L0932_ui_MaximumLoad = _vm->_championMan->f309_getMaximumLoad(champ)) > (AL0931_ui_Load = champ->_load)) { /* BUG0_72 The party moves very slowly even though no champion 'Load' value is drawn in red. When the Load of a champion has exactly the maximum value he can carry then the Load is drawn in yellow but the speed is the same as when the champion is overloaded (when the Load is drawn in red). The comparison operator should be >= instead of > */
+		L0933_i_Ticks = 2;
+		if (((int32)AL0931_ui_Load << 3) > ((int32)L0932_ui_MaximumLoad * 5)) {
+			L0933_i_Ticks++;
+		}
+		AL0931_ui_WoundTicks = 1;
+	} else {
+		L0933_i_Ticks = 4 + (((AL0931_ui_Load - L0932_ui_MaximumLoad) << 2) / L0932_ui_MaximumLoad);
+		AL0931_ui_WoundTicks = 2;
+	}
+	if (getFlag(champ->_wounds, k0x0020_ChampionWoundFeet)) {
+		L0933_i_Ticks += AL0931_ui_WoundTicks;
+	}
+	if (_vm->_objectMan->f33_getIconIndex(champ->_slots[k5_ChampionSlotFeet]) == k194_IconIndiceArmourBootOfSpeed) {
+		L0933_i_Ticks--;
+	}
+	return L0933_i_Ticks;
 }
 
 ChampionIndex ChampionMan::f285_getIndexInCell(int16 cell) {
@@ -1269,9 +1296,9 @@ void ChampionMan::f280_addCandidateChampionToParty(uint16 championPortraitIndex)
 	if (++_vm->_championMan->_g305_partyChampionCount == 1) {
 		_vm->_eventMan->f368_commandSetLeader(k0_ChampionFirst);
 		_vm->_menuMan->_g508_refreshActionArea = true;
-	} else { 
+	} else {
 		_vm->_menuMan->f388_clearActingChampion();
-		_vm->_menuMan->f386_drawActionIcon((ChampionIndex)(_vm->_championMan->_g305_partyChampionCount - 1)); 
+		_vm->_menuMan->f386_drawActionIcon((ChampionIndex)(_vm->_championMan->_g305_partyChampionCount - 1));
 	}
 	L0802_i_MapX = _vm->_dungeonMan->_g306_partyMapX;
 	L0803_i_MapY = _vm->_dungeonMan->_g307_partyMapY;
