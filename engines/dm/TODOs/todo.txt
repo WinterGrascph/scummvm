@@ -32,8 +32,8 @@ Todo:
 
 Finish stuff:
 	F0444_STARTEND_Endgame
-	Make missing code warnings to STUB methods
-	Add quit resuest from scummvm
+	Make missing code warnings into STUB methods
+
 	f380_processCommandQueue
 	Missing main loop methods
 	Save file f433_processCommand140_saveGame fails silently
@@ -44,7 +44,3 @@ Finish stuff:
 	Add dialogs
 	Add failcheck to saveing and loading
 	
-
-
-Refactoring
-	Places implementing mini mainloop and where input doesn't really matter should call discardInput instead of processInput
