@@ -621,6 +621,7 @@ public:
 	bool _g322_paletteSwitchingEnabled; // @ G0322_B_PaletteSwitchingEnabled
 	bool _g342_refreshDungeonViewPaleteRequested; // @ G0342_B_RefreshDungeonViewPaletteRequested
 	int16 _g304_dungeonViewPaletteIndex; // @ G0304_i_DungeonViewPaletteIndex
+	uint16 _g345_aui_BlankBuffer[32]; // @G0345_aui_BlankBuffer
 	uint16 _g347_paletteTopAndBottomScreen[16]; // @ G0347_aui_Palette_TopAndBottomScreen
 
 	explicit DisplayMan(DMEngine *dmEngine);
@@ -644,7 +645,6 @@ public:
 	uint16 getPixelWidth(uint16 index);
 	/// Gives the height of an IMG1 type item
 	uint16 getPixelHeight(uint16 index);
-
 
 	void f99_copyBitmapAndFlipHorizontal(byte *srcBitmap, byte *destBitmap, uint16 byteWidth, uint16 height); // @ F0099_DUNGEONVIEW_CopyBitmapAndFlipHorizontal
 	void f108_drawFloorOrnament(uint16 floorOrnOrdinal, uint16 viewFloorIndex); // @ F0108_DUNGEONVIEW_DrawFloorOrnament
@@ -727,8 +727,7 @@ public:
 	byte *f492_getDerivedBitmap(int16 derivedBitmapIndex); // @ F0492_CACHE_GetDerivedBitmap
 	void f493_addDerivedBitmap(int16 derivedBitmapIndex); // @ F0493_CACHE_AddDerivedBitmap
 
-
-
+	void f436_STARTEND_FadeToPalette(uint16 *P0849_pui_Palette) { warning(false, "STUB: f436_STARTEND_FadeToPalette"); }
 
 };
 
