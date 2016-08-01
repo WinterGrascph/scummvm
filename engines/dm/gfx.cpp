@@ -742,7 +742,7 @@ DisplayMan::~DisplayMan() {
 	delete[] _g639_derivedBitmapByteCount;
 	if (_g638_derivedBitmaps) {
 		for (uint16 i = 0; i < k730_DerivedBitmapMaximumCount; ++i)
-			delete[] _g638_derivedBitmaps;
+			delete[] _g638_derivedBitmaps[i];
 		delete[] _g638_derivedBitmaps;
 	}
 
