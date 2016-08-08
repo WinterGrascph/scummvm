@@ -748,6 +748,7 @@ public:
 	bool f491_isDerivedBitmapInCache(int16 derivedBitmapIndex); // @  F0491_CACHE_IsDerivedBitmapInCache
 	byte *f492_getDerivedBitmap(int16 derivedBitmapIndex); // @ F0492_CACHE_GetDerivedBitmap
 	void f493_addDerivedBitmap(int16 derivedBitmapIndex); // @ F0493_CACHE_AddDerivedBitmap
+	void f480_releaseBlock(uint16 index); // @ F0480_CACHE_ReleaseBlock
 	uint16 f431_getDarkenedColor(uint16 RGBcolor);
 	void f436_STARTEND_FadeToPalette(uint16 *P0849_pui_Palette) { warning(false, "STUB: f436_STARTEND_FadeToPalette"); }
 };
