@@ -418,9 +418,9 @@ DungeonMan::~DungeonMan() {
 	delete[] _g283_squareFirstThings;
 	delete[] _g260_dungeonTextData;
 	delete[] _g279_dungeonMapData;
-	for (uint16 i = 0; i < 16; ++i) {
+	for (uint16 i = 0; i < 16; ++i)
 		delete[] _g284_thingData[i];
-	}
+
 	delete[] _g276_dungeonRawMapData;
 }
 
@@ -481,25 +481,6 @@ void DungeonMan::f455_decompressDungeonFile() {
 	f.close();
 }
 
-byte g236_AdditionalThingCounts[16] = { // @ G0236_auc_Graphic559_AdditionalThingCounts{
-	0,    /* Door */
-	0,    /* Teleporter */
-	0,    /* Text String */
-	0,    /* Sensor */
-	75,   /* Group */
-	100,  /* Weapon */
-	120,  /* Armour */
-	0,    /* Scroll */
-	5,    /* Potion */
-	0,    /* Container */
-	140,  /* Junk */
-	0,    /* Unused */
-	0,    /* Unused */
-	0,    /* Unused */
-	60,   /* Projectile */
-	50    /* Explosion */
-};
-
 // this is the number of uint16s the data has to be stored, not the length of the data in dungeon.dat!
 byte g235_ThingDataWordCount[16] = { // @ G0235_auc_Graphic559_ThingDataByteCount
 	2,   /* Door */
@@ -537,13 +518,34 @@ const Thing Thing::_explRebirthStep2(0xFFE5); // @ C0xFFE5_THING_EXPLOSION_REBIR
 const Thing Thing::_party(0xFFFF); // @ C0xFFFF_THING_PARTY          
 
 void DungeonMan::f434_loadDungeonFile(Common::InSaveFile *file) {
+	static const byte additionalThingCounts[16] = { // @ G0236_auc_Graphic559_AdditionalThingCounts{
+		0,    /* Door */
+		0,    /* Teleporter */
+		0,    /* Text String */
+		0,    /* Sensor */
+		75,   /* Group */
+		100,  /* Weapon */
+		120,  /* Armour */
+		0,    /* Scroll */
+		5,    /* Potion */
+		0,    /* Container */
+		140,  /* Junk */
+		0,    /* Unused */
+		0,    /* Unused */
+		0,    /* Unused */
+		60,   /* Projectile */
+		50    /* Explosion */
+	};
+
 	if (_vm->_g298_newGame)
 		f455_decompressDungeonFile();
 
 	Common::ReadStream *dunDataStream = nullptr;
-	if (file) { // if loading a save 
+	if (file) {
+		// if loading a save 
 		dunDataStream = file;
-	} else { // else read dungeon.dat
+	} else {
+		// else read dungeon.dat
 		assert(_rawDunFileData && _rawDunFileDataSize);
 		dunDataStream = new Common::MemoryReadStream(_rawDunFileData, _rawDunFileDataSize, DisposeAfterUse::NO);
 	}
@@ -656,7 +658,7 @@ void DungeonMan::f434_loadDungeonFile(Common::InSaveFile *file) {
 	for (uint16 thingType = k0_DoorThingType; thingType < k16_ThingTypeTotal; ++thingType) {
 		uint16 thingCount = _g278_dungeonFileHeader._thingCounts[thingType];
 		if (_vm->_g298_newGame)
-			_g278_dungeonFileHeader._thingCounts[thingType] = MIN((thingType == k15_ExplosionThingType) ? 768 : 1024, thingCount + g236_AdditionalThingCounts[thingType]);
+			_g278_dungeonFileHeader._thingCounts[thingType] = MIN((thingType == k15_ExplosionThingType) ? 768 : 1024, thingCount + additionalThingCounts[thingType]);
 
 		uint16 thingStoreWordCount = g235_ThingDataWordCount[thingType];
 
@@ -690,7 +692,7 @@ void DungeonMan::f434_loadDungeonFile(Common::InSaveFile *file) {
 			if ((thingType == k4_GroupThingType) || thingType >= k14_ProjectileThingType)
 				_vm->_timeline->_g369_eventMaxCount += _g278_dungeonFileHeader._thingCounts[thingType];
 
-			for (uint16 i = 0; i < g236_AdditionalThingCounts[thingType]; ++i)
+			for (uint16 i = 0; i < additionalThingCounts[thingType]; ++i)
 				(_g284_thingData[thingType] + (thingCount + i) * thingStoreWordCount)[0] = Thing::_none.toUint16();
 		}
 	}
@@ -731,7 +733,8 @@ void DungeonMan::f173_setCurrentMap(uint16 mapIndex) {
 		DoorInfo(3, 110),   /* Door type 0 Portcullis */
 		DoorInfo(0,  42),   /* Door type 1 Wooden door */
 		DoorInfo(0, 230),   /* Door type 2 Iron door */
-		DoorInfo(5, 255)}; /* Door type 3 Ra door */
+		DoorInfo(5, 255)    /* Door type 3 Ra door */
+	};
 
 	if (_g272_currMapIndex == mapIndex)
 		return;
@@ -799,23 +802,17 @@ Square DungeonMan::f152_getRelSquare(Direction dir, int16 stepsForward, int16 st
 }
 
 int16 DungeonMan::f160_getSquareFirstThingIndex(int16 mapX, int16 mapY) {
-	uint16 L0260_ui_ThingIndex;
-	int16 L0261_i_MapY;
-	unsigned char* L0262_puc_Square;
-
-
-	L0262_puc_Square = _vm->_dungeonMan->_g271_currMapData[mapX];
-	if ((mapX < 0) || (mapX >= _vm->_dungeonMan->_g273_currMapWidth) || (mapY < 0) || (mapY >= _vm->_dungeonMan->_g274_currMapHeight) || !getFlag(L0262_puc_Square[mapY], k0x0010_ThingListPresent)) {
+	unsigned char *curSquare = _vm->_dungeonMan->_g271_currMapData[mapX];
+	if ((mapX < 0) || (mapX >= _vm->_dungeonMan->_g273_currMapWidth) || (mapY < 0) || (mapY >= _vm->_dungeonMan->_g274_currMapHeight) || !getFlag(curSquare[mapY], k0x0010_ThingListPresent))
 		return -1;
+
+	int16 curMapY = 0;
+	uint16 thingIndex = _vm->_dungeonMan->_g270_currMapColCumulativeSquareFirstThingCount[mapX];
+	while (curMapY++ != mapY) {
+		if (getFlag(*curSquare++, k0x0010_ThingListPresent))
+			thingIndex++;
 	}
-	L0261_i_MapY = 0;
-	L0260_ui_ThingIndex = _vm->_dungeonMan->_g270_currMapColCumulativeSquareFirstThingCount[mapX];
-	while (L0261_i_MapY++ != mapY) {
-		if (getFlag(*L0262_puc_Square++, k0x0010_ThingListPresent)) {
-			L0260_ui_ThingIndex++;
-		}
-	}
-	return L0260_ui_ThingIndex;
+	return thingIndex;
 }
 
 Thing DungeonMan::f161_getSquareFirstThing(int16 mapX, int16 mapY) {
@@ -825,120 +822,125 @@ Thing DungeonMan::f161_getSquareFirstThing(int16 mapX, int16 mapY) {
 	return _g283_squareFirstThings[index];
 }
 
-
-// TODO: produce more GOTOs
 void DungeonMan::f172_setSquareAspect(uint16 *aspectArray, Direction dir, int16 mapX, int16 mapY) {	
-#define AP0318_i_ThingType dir
 	unsigned char L0307_uc_Multiple;
 #define AL0307_uc_Square            L0307_uc_Multiple
 #define AL0307_uc_FootprintsAllowed L0307_uc_Multiple
 #define AL0307_uc_ScentOrdinal      L0307_uc_Multiple
-	Sensor* L0308_ps_Sensor;
-	bool L0309_B_LeftRandomWallOrnamentAllowed = 0;
-	int16 L0310_i_Multiple = 0;
-#define AL0310_B_FrontRandomWallOrnamentAllowed L0310_i_Multiple
-#define AL0310_i_SideIndex                      L0310_i_Multiple
-	bool L0311_B_RightRandomWallOrnamentAllowed = 0;
-	int16 L0312_i_ThingType;
-	bool L0313_B_SquareIsFakeWall;
-	Thing L0314_T_Thing;
-
 
 	for (uint16 i = 0; i < 5; ++i)
 		aspectArray[i] = 0;
-	L0314_T_Thing = f161_getSquareFirstThing(mapX, mapY);
+
+	Thing curThing = f161_getSquareFirstThing(mapX, mapY);
 	AL0307_uc_Square = f151_getSquare(mapX, mapY).toByte();
-	switch (aspectArray[k0_ElemAspect] = Square(AL0307_uc_Square).getType()) {
+	bool leftRandomWallOrnamentAllowed = false;
+	bool rightRandomWallOrnamentAllowed = false;
+	bool frontRandomWallOrnamentAllowed = false;
+	bool squareIsFakeWall;
+
+	aspectArray[k0_ElemAspect] = Square(AL0307_uc_Square).getType();
+	switch (aspectArray[k0_ElemAspect]) {
 	case k0_ElementTypeWall:
 		switch (dir) {
 		case kDirNorth:
-			L0309_B_LeftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0004_WallEastRandOrnAllowed);
-			AL0310_B_FrontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0002_WallSouthRandOrnAllowed);
-			L0311_B_RightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0001_WallWestRandOrnAllowed);
+			leftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0004_WallEastRandOrnAllowed);
+			frontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0002_WallSouthRandOrnAllowed);
+			rightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0001_WallWestRandOrnAllowed);
 			break;
 		case kDirEast:
-			L0309_B_LeftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0002_WallSouthRandOrnAllowed);
-			AL0310_B_FrontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0001_WallWestRandOrnAllowed);
-			L0311_B_RightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_WallNorthRandOrnAllowed);
+			leftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0002_WallSouthRandOrnAllowed);
+			frontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0001_WallWestRandOrnAllowed);
+			rightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_WallNorthRandOrnAllowed);
 			break;
 		case kDirSouth:
-			L0309_B_LeftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0001_WallWestRandOrnAllowed);
-			AL0310_B_FrontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_WallNorthRandOrnAllowed);
-			L0311_B_RightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0004_WallEastRandOrnAllowed);
+			leftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0001_WallWestRandOrnAllowed);
+			frontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_WallNorthRandOrnAllowed);
+			rightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0004_WallEastRandOrnAllowed);
 			break;
 		case kDirWest:
-			L0309_B_LeftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_WallNorthRandOrnAllowed);
-			AL0310_B_FrontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0004_WallEastRandOrnAllowed);
-			L0311_B_RightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0002_WallSouthRandOrnAllowed);
+			leftRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_WallNorthRandOrnAllowed);
+			frontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0004_WallEastRandOrnAllowed);
+			rightRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0002_WallSouthRandOrnAllowed);
 			break;
 		default:
 			assert(false);
 		}
 		_vm->_displayMan->_g289_championPortraitOrdinal = 0; 
-		L0313_B_SquareIsFakeWall = false;
+		squareIsFakeWall = false;
 T0172010_ClosedFakeWall:
-		f171_setSquareAspectOrnOrdinals(aspectArray, L0309_B_LeftRandomWallOrnamentAllowed, AL0310_B_FrontRandomWallOrnamentAllowed, L0311_B_RightRandomWallOrnamentAllowed, dir, mapX, mapY, L0313_B_SquareIsFakeWall);
-		while ((L0314_T_Thing != Thing::_endOfList) && ((L0312_i_ThingType = L0314_T_Thing.getType()) <= k3_SensorThingType)) {
-			if (AL0310_i_SideIndex = M21_normalizeModulo4(L0314_T_Thing.getCell() - dir)) { /* Invisible on the back wall if 0 */
-				L0308_ps_Sensor = (Sensor*)f156_getThingData(L0314_T_Thing);
-				if (L0312_i_ThingType == k2_TextstringType) {
-					if (((TextString*)L0308_ps_Sensor)->isVisible()) {
+		f171_setSquareAspectOrnOrdinals(aspectArray, leftRandomWallOrnamentAllowed, frontRandomWallOrnamentAllowed, rightRandomWallOrnamentAllowed, dir, mapX, mapY, squareIsFakeWall);
+		while ((curThing != Thing::_endOfList) && (curThing.getType() <= k3_SensorThingType)) {
+			ThingType curThingType = curThing.getType();
+			int16 AL0310_i_SideIndex = M21_normalizeModulo4(curThing.getCell() - dir);
+			if (AL0310_i_SideIndex) { /* Invisible on the back wall if 0 */
+				Sensor *curSensor = (Sensor*)f156_getThingData(curThing);
+				if (curThingType == k2_TextstringType) {
+					if (((TextString*)curSensor)->isVisible()) {
 						aspectArray[AL0310_i_SideIndex + 1] = _g265_currMapInscriptionWallOrnIndex + 1;
-						_vm->_displayMan->_g290_inscriptionThing = L0314_T_Thing; /* BUG0_76 The same text is drawn on multiple sides of a wall square. The engine stores only a single text to draw on a wall in a global variable. Even if different texts are placed on differents sides of the wall, the same text is drawn on each affected side */
+						_vm->_displayMan->_g290_inscriptionThing = curThing; /* BUG0_76 The same text is drawn on multiple sides of a wall square. The engine stores only a single text to draw on a wall in a global variable. Even if different texts are placed on different sides of the wall, the same text is drawn on each affected side */
 					}
 				} else {
-					aspectArray[AL0310_i_SideIndex + 1] = L0308_ps_Sensor->getOrnOrdinal();
-					if (L0308_ps_Sensor->getType() == k127_SensorWallChampionPortrait) {
-						_vm->_displayMan->_g289_championPortraitOrdinal = _vm->M0_indexToOrdinal(L0308_ps_Sensor->getData());
+					aspectArray[AL0310_i_SideIndex + 1] = curSensor->getOrnOrdinal();
+					if (curSensor->getType() == k127_SensorWallChampionPortrait) {
+						_vm->_displayMan->_g289_championPortraitOrdinal = _vm->M0_indexToOrdinal(curSensor->getData());
 					}
 				}
 			}
-			L0314_T_Thing = f159_getNextThing(L0314_T_Thing);
+			curThing = f159_getNextThing(curThing);
 		}
-		if (L0313_B_SquareIsFakeWall && (_g306_partyMapX != mapX) && (_g307_partyMapY != mapY)) {
+		if (squareIsFakeWall && (_g306_partyMapX != mapX) && (_g307_partyMapY != mapY)) {
 			aspectArray[k1_FirstGroupOrObjectAspect] = Thing::_endOfList.toUint16();
 			return;
 		}
 		break;
-	case k2_ElementTypePit:
-		if (getFlag(AL0307_uc_Square, k0x0008_PitOpen)) {
-			aspectArray[k2_PitInvisibleAspect] = getFlag(AL0307_uc_Square, k0x0004_PitInvisible);
-			AL0307_uc_FootprintsAllowed &= 0x0001;
-		} else {
-			aspectArray[k0_ElemAspect] = k1_CorridorElemType;
-			AL0307_uc_FootprintsAllowed = true;
-		}
-		goto T0172030_Pit;
 	case k6_ElementTypeFakeWall:
 		if (!getFlag(AL0307_uc_Square, k0x0004_FakeWallOpen)) {
 			aspectArray[k0_ElemAspect] = k0_ElementTypeWall;
-			L0309_B_LeftRandomWallOrnamentAllowed = L0311_B_RightRandomWallOrnamentAllowed = AL0310_B_FrontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_FakeWallRandOrnOrFootPAllowed);
-			L0313_B_SquareIsFakeWall = true;
+			leftRandomWallOrnamentAllowed = rightRandomWallOrnamentAllowed = frontRandomWallOrnamentAllowed = getFlag(AL0307_uc_Square, k0x0008_FakeWallRandOrnOrFootPAllowed);
+			squareIsFakeWall = true;
 			goto T0172010_ClosedFakeWall;
 		}
 		aspectArray[k0_ElemAspect] = k1_CorridorElemType;
 		AL0307_uc_FootprintsAllowed = getFlag(AL0307_uc_Square, k0x0008_FakeWallRandOrnOrFootPAllowed) ? 8 : 0;
+		// No break on purpose
 	case k1_CorridorElemType:
-		aspectArray[k4_FloorOrnOrdAspect] = f170_getRandomOrnOrdinal(getFlag(AL0307_uc_Square, k0x0008_CorridorRandOrnAllowed), _g269_currMap->_randFloorOrnCount, mapX, mapY, 30);
-T0172029_Teleporter:
-		AL0307_uc_FootprintsAllowed = true;
-T0172030_Pit:
-		while ((L0314_T_Thing != Thing::_endOfList) && ((AP0318_i_ThingType = (Direction)L0314_T_Thing.getType()) <= k3_SensorThingType)) {
-			if (AP0318_i_ThingType == k3_SensorThingType) {
-				L0308_ps_Sensor = (Sensor*)f156_getThingData(L0314_T_Thing);
-				aspectArray[k4_FloorOrnOrdAspect] = L0308_ps_Sensor->getOrnOrdinal();
-			}
-			L0314_T_Thing = f159_getNextThing(L0314_T_Thing);
-		}
-		goto T0172049_Footprints;
+	case k2_ElementTypePit:
 	case k5_ElementTypeTeleporter:
-		aspectArray[k2_TeleporterVisibleAspect] = getFlag(AL0307_uc_Square, k0x0008_TeleporterOpen) && getFlag(AL0307_uc_Square, k0x0004_TeleporterVisible);
-		goto T0172029_Teleporter;
+		if (aspectArray[k0_ElemAspect] == k1_CorridorElemType) {
+			aspectArray[k4_FloorOrnOrdAspect] = f170_getRandomOrnOrdinal(getFlag(AL0307_uc_Square, k0x0008_CorridorRandOrnAllowed), _g269_currMap->_randFloorOrnCount, mapX, mapY, 30);
+			AL0307_uc_FootprintsAllowed = true;
+		} else if (aspectArray[k0_ElemAspect] == k2_ElementTypePit) {
+			if (getFlag(AL0307_uc_Square, k0x0008_PitOpen)) {
+				aspectArray[k2_PitInvisibleAspect] = getFlag(AL0307_uc_Square, k0x0004_PitInvisible);
+				AL0307_uc_FootprintsAllowed &= 0x0001;
+			} else {
+				aspectArray[k0_ElemAspect] = k1_CorridorElemType;
+				AL0307_uc_FootprintsAllowed = true;
+			}
+		} else { // k5_ElementTypeTeleporter
+			aspectArray[k2_TeleporterVisibleAspect] = getFlag(AL0307_uc_Square, k0x0008_TeleporterOpen) && getFlag(AL0307_uc_Square, k0x0004_TeleporterVisible);
+			AL0307_uc_FootprintsAllowed = true;
+		}
+
+		while ((curThing != Thing::_endOfList) && ((Direction)curThing.getType() <= k3_SensorThingType)) {
+			if (curThing.getType() == k3_SensorThingType) {
+				Sensor *curSensor = (Sensor*)f156_getThingData(curThing);
+				aspectArray[k4_FloorOrnOrdAspect] = curSensor->getOrnOrdinal();
+			}
+			curThing = f159_getNextThing(curThing);
+		}
+
+		if (AL0307_uc_FootprintsAllowed && (AL0307_uc_ScentOrdinal = _vm->_championMan->f315_getScentOrdinal(mapX, mapY)) && (--AL0307_uc_ScentOrdinal >= _vm->_championMan->_g407_party._firstScentIndex) && (AL0307_uc_ScentOrdinal < _vm->_championMan->_g407_party._lastScentIndex))
+			setFlag(aspectArray[k4_FloorOrnOrdAspect], k0x8000_FootprintsAspect);
+
+		break;
 	case k3_ElementTypeStairs:
 		aspectArray[k0_ElemAspect] = (bool((getFlag(AL0307_uc_Square, k0x0008_StairsNorthSouthOrient) >> 3)) == isOrientedWestEast(dir)) ? k18_ElementTypeStairsSide : k19_ElementTypeStaisFront;
 		aspectArray[k2_StairsUpAspect] = getFlag(AL0307_uc_Square, k0x0004_StairsUp);
 		AL0307_uc_FootprintsAllowed = false;
-		goto T0172046_Stairs;
+		while ((curThing != Thing::_endOfList) && (curThing.getType() <= k3_SensorThingType))
+			curThing = f159_getNextThing(curThing);
+		break;
 	case k4_DoorElemType:
 		if (bool((getFlag(AL0307_uc_Square, k0x0008_DoorNorthSouthOrient) >> 3)) == isOrientedWestEast(dir)) {
 			aspectArray[k0_ElemAspect] = k16_DoorSideElemType;
@@ -948,54 +950,50 @@ T0172030_Pit:
 			aspectArray[k3_DoorThingIndexAspect] = f161_getSquareFirstThing(mapX, mapY).getIndex();
 		}
 		AL0307_uc_FootprintsAllowed = true;
-T0172046_Stairs:
-		while ((L0314_T_Thing != Thing::_endOfList) && (L0314_T_Thing.getType() <= k3_SensorThingType)) {
-			L0314_T_Thing = f159_getNextThing(L0314_T_Thing);
-		}
-T0172049_Footprints:
-		if (AL0307_uc_FootprintsAllowed && (AL0307_uc_ScentOrdinal = _vm->_championMan->f315_getScentOrdinal(mapX, mapY)) && (--AL0307_uc_ScentOrdinal >= _vm->_championMan->_g407_party._firstScentIndex) && (AL0307_uc_ScentOrdinal < _vm->_championMan->_g407_party._lastScentIndex)) {
+
+		while ((curThing != Thing::_endOfList) && (curThing.getType() <= k3_SensorThingType))
+			curThing = f159_getNextThing(curThing);
+
+		if (AL0307_uc_FootprintsAllowed && (AL0307_uc_ScentOrdinal = _vm->_championMan->f315_getScentOrdinal(mapX, mapY)) && (--AL0307_uc_ScentOrdinal >= _vm->_championMan->_g407_party._firstScentIndex) && (AL0307_uc_ScentOrdinal < _vm->_championMan->_g407_party._lastScentIndex))
 			setFlag(aspectArray[k4_FloorOrnOrdAspect], k0x8000_FootprintsAspect);
-		}
+		break;
 	}
-	aspectArray[k1_FirstGroupOrObjectAspect] = L0314_T_Thing.toUint16();
+	aspectArray[k1_FirstGroupOrObjectAspect] = curThing.toUint16();
 }
 
 void DungeonMan::f171_setSquareAspectOrnOrdinals(uint16 *aspectArray, bool leftAllowed, bool frontAllowed, bool rightAllowed, int16 dir,
 												 int16 mapX, int16 mapY, bool isFakeWall) {
-	int16 L0306_i_Multiple;
-#define AL0306_i_RandomWallOrnamentCount L0306_i_Multiple
-#define AL0306_i_SideIndex               L0306_i_Multiple
 
-
-	AL0306_i_RandomWallOrnamentCount = _vm->_dungeonMan->_g269_currMap->_randWallOrnCount;
-	aspectArray[k2_RightWallOrnOrdAspect] = _vm->_dungeonMan->f170_getRandomOrnOrdinal(leftAllowed, AL0306_i_RandomWallOrnamentCount, mapX, ++mapY * (M21_normalizeModulo4(++dir) + 1), 30);
-	aspectArray[k3_FrontWallOrnOrdAspect] = _vm->_dungeonMan->f170_getRandomOrnOrdinal(frontAllowed, AL0306_i_RandomWallOrnamentCount, mapX, mapY * (M21_normalizeModulo4(++dir) + 1), 30);
-	aspectArray[k4_LeftWallOrnOrdAspect] = _vm->_dungeonMan->f170_getRandomOrnOrdinal(rightAllowed, AL0306_i_RandomWallOrnamentCount, mapX, mapY-- * (M21_normalizeModulo4(++dir) + 1), 30);
+	int16 randomWallOrnamentCount = _vm->_dungeonMan->_g269_currMap->_randWallOrnCount;
+	aspectArray[k2_RightWallOrnOrdAspect] = _vm->_dungeonMan->f170_getRandomOrnOrdinal(leftAllowed, randomWallOrnamentCount, mapX, ++mapY * (M21_normalizeModulo4(++dir) + 1), 30);
+	aspectArray[k3_FrontWallOrnOrdAspect] = _vm->_dungeonMan->f170_getRandomOrnOrdinal(frontAllowed, randomWallOrnamentCount, mapX, mapY * (M21_normalizeModulo4(++dir) + 1), 30);
+	aspectArray[k4_LeftWallOrnOrdAspect] = _vm->_dungeonMan->f170_getRandomOrnOrdinal(rightAllowed, randomWallOrnamentCount, mapX, mapY-- * (M21_normalizeModulo4(++dir) + 1), 30);
 	if (isFakeWall || (mapX < 0) || (mapX >= _vm->_dungeonMan->_g273_currMapWidth) || (mapY < 0) || (mapY >= _vm->_dungeonMan->_g274_currMapHeight)) { /* If square is a fake wall or is out of map bounds */
-		for (AL0306_i_SideIndex = k2_RightWallOrnOrdAspect; AL0306_i_SideIndex <= k4_LeftWallOrnOrdAspect; AL0306_i_SideIndex++) { /* Loop to remove any random ornament that is an alcove */
-			if (_vm->_dungeonMan->f149_isWallOrnAnAlcove(_vm->M1_ordinalToIndex(aspectArray[AL0306_i_SideIndex]))) {
-				aspectArray[AL0306_i_SideIndex] = 0;
-			}
+		for (int16 sideIndex = k2_RightWallOrnOrdAspect; sideIndex <= k4_LeftWallOrnOrdAspect; sideIndex++) { /* Loop to remove any random ornament that is an alcove */
+			if (_vm->_dungeonMan->f149_isWallOrnAnAlcove(_vm->M1_ordinalToIndex(aspectArray[sideIndex])))
+				aspectArray[sideIndex] = 0;
 		}
 	}
 }
 
 int16 DungeonMan::f170_getRandomOrnOrdinal(bool allowed, int16 count, int16 mapX, int16 mapY, int16 modulo) {
-	int16 L0305_i_RandomOrnamentIndex;
+	int16 randomOrnamentIndex = f169_getRandomOrnamentIndex((int16)2000 + (mapX << 5) + mapY, (int16)3000 + (_vm->_dungeonMan->_g272_currMapIndex << (int16)6) + _vm->_dungeonMan->_g273_currMapWidth + _vm->_dungeonMan->_g274_currMapHeight, modulo);
 
+	if (allowed && (randomOrnamentIndex < count))
+		return _vm->M0_indexToOrdinal(randomOrnamentIndex);
 
-	if (allowed && ((L0305_i_RandomOrnamentIndex = f169_getRandomOrnamentIndex((int16)2000 + (mapX << 5) + mapY, (int16)3000 + (_vm->_dungeonMan->_g272_currMapIndex << (int16)6) + _vm->_dungeonMan->_g273_currMapWidth + _vm->_dungeonMan->_g274_currMapHeight, modulo)) < count)) {
-		return _vm->M0_indexToOrdinal(L0305_i_RandomOrnamentIndex);
-	}
 	return 0;
 }
 
 
 bool DungeonMan::f149_isWallOrnAnAlcove(int16 wallOrnIndex) {
-	if (wallOrnIndex >= 0)
-		for (uint16 i = 0; i < k3_AlcoveOrnCount; ++i)
+	if (wallOrnIndex >= 0) {
+		for (uint16 i = 0; i < k3_AlcoveOrnCount; ++i) {
 			if (_vm->_displayMan->_g267_currMapAlcoveOrnIndices[i] == wallOrnIndex)
 				return true;
+		}
+	}
+
 	return false;
 }
 
@@ -1011,108 +1009,88 @@ Thing DungeonMan::f159_getNextThing(Thing thing) {
 	return Thing(f156_getThingData(thing)[0]);
 }
 
-char g255_MessageAndScrollEscReplacementStrings[32][8] = { // @ G0255_aac_Graphic559_MessageAndScrollEscapeReplacementStrings
-	{'x',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { '?',  0,  0,  0, 0, 0, 0, 0 }, */
-	{'y',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { '!',  0,  0,  0, 0, 0, 0, 0 }, */
-	{'T','H','E',' ', 0, 0, 0, 0},
-	{'Y','O','U',' ', 0, 0, 0, 0},
-	{'z',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{'{',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{'|',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{'}',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{'~',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{'',  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0}};
-char g256_EscReplacementCharacters[32][2] = { // @ G0256_aac_Graphic559_EscapeReplacementCharacters
-	{'a', 0},
-	{'b', 0},
-	{'c', 0},
-	{'d', 0},
-	{'e', 0},
-	{'f', 0},
-	{'g', 0},
-	{'h', 0},
-	{'i', 0},
-	{'j', 0},
-	{'k', 0},
-	{'l', 0},
-	{'m', 0},
-	{'n', 0},
-	{'o', 0},
-	{'p', 0},
-	{'q', 0},
-	{'r', 0},
-	{'s', 0},
-	{'t', 0},
-	{'u', 0},
-	{'v', 0},
-	{'w', 0},
-	{'x', 0},
-	{'0', 0},
-	{'1', 0},
-	{'2', 0},
-	{'3', 0},
-	{'4', 0},
-	{'5', 0},
-	{'6', 0},
-	{'7', 0}};
-char g257_InscriptionEscReplacementStrings[32][8] = { // @ G0257_aac_Graphic559_InscriptionEscapeReplacementStrings
-	{28,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{29,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{19,  7,  4, 26, 0, 0, 0, 0},
-	{24, 14, 20, 26, 0, 0, 0, 0},
-	{30,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{31,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{32,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{33,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{34,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{35,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0},
-	{0,  0,  0,  0, 0, 0, 0, 0}};
-
-
 void DungeonMan::f168_decodeText(char *destString, Thing thing, TextType type) {
+	static char messageAndScrollEscReplacementStrings[32][8] = { // @ G0255_aac_Graphic559_MessageAndScrollEscapeReplacementStrings
+		{'x',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { '?',  0,  0,  0, 0, 0, 0, 0 }, */
+		{'y',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { '!',  0,  0,  0, 0, 0, 0, 0 }, */
+		{'T', 'H', 'E', ' ', 0, 0, 0, 0},
+		{'Y', 'O', 'U', ' ', 0, 0, 0, 0},
+		{'z',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{'{',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{'|',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{'}',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{'~',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{'',   0,   0,   0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0},
+		{0,     0,   0,   0, 0, 0, 0, 0}
+	};
+
+	static char escReplacementCharacters[32][2] = { // @ G0256_aac_Graphic559_EscapeReplacementCharacters
+		{'a', 0}, {'b', 0}, {'c', 0}, {'d', 0},
+		{'e', 0}, {'f', 0}, {'g', 0}, {'h', 0},
+		{'i', 0}, {'j', 0}, {'k', 0}, {'l', 0},
+		{'m', 0}, {'n', 0}, {'o', 0}, {'p', 0},
+		{'q', 0}, {'r', 0}, {'s', 0}, {'t', 0},
+		{'u', 0}, {'v', 0}, {'w', 0}, {'x', 0},
+		{'0', 0}, {'1', 0}, {'2', 0}, {'3', 0},
+		{'4', 0}, {'5', 0}, {'6', 0}, {'7', 0}
+	};
+
+	static char inscriptionEscReplacementStrings[32][8] = { // @ G0257_aac_Graphic559_InscriptionEscapeReplacementStrings
+		{28,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{29,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{19,  7,  4, 26, 0, 0, 0, 0},
+		{24, 14, 20, 26, 0, 0, 0, 0},
+		{30,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{31,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{32,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{33,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{34,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{35,  0,  0,  0, 0, 0, 0, 0}, /* Atari ST Version 1.0 1987-12-08 1987-12-11 1.1 1.2EN 1.2GE: { 0,  0,  0,  0, 0, 0, 0, 0 }, */
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0},
+		{0,   0,  0,  0, 0, 0, 0, 0}
+	};
+
 	TextString textString(_g284_thingData[k2_TextstringType] + thing.getIndex() * g235_ThingDataWordCount[k2_TextstringType]);
 	if ((textString.isVisible()) || (type & k0x8000_DecodeEvenIfInvisible)) {
 		type = (TextType)(type & ~k0x8000_DecodeEvenIfInvisible);
@@ -1145,82 +1123,73 @@ void DungeonMan::f168_decodeText(char *destString, Thing thing, TextType type) {
 			if (escChar) {
 				*destString = '\0';
 				if (escChar == 30) {
-					if (type != k0_TextTypeInscription) {
-						escReplString = g255_MessageAndScrollEscReplacementStrings[code];
-					} else {
-						escReplString = g257_InscriptionEscReplacementStrings[code];
-					}
-				} else {
-					escReplString = g256_EscReplacementCharacters[code];
-				}
+					if (type != k0_TextTypeInscription)
+						escReplString = messageAndScrollEscReplacementStrings[code];
+					else
+						escReplString = inscriptionEscReplacementStrings[code];
+				} else
+					escReplString = escReplacementCharacters[code];
+
 				strcat(destString, escReplString);
 				destString += strlen(escReplString);
 				escChar = 0;
 			} else if (code < 28) {
 				if (type != k0_TextTypeInscription) {
-					if (code == 26) {
+					if (code == 26)
 						code = ' ';
-					} else if (code == 27) {
+					else if (code == 27)
 						code = '.';
-					} else {
+					else
 						code += 'A';
-					}
 				}
 				*destString++ = code;
-			} else if (code == 28) {
+			} else if (code == 28)
 				*destString++ = sepChar;
-			} else if (code <= 30) {
+			else if (code <= 30)
 				escChar = code;
-			} else {
+			else
 				break;
-			}
 		}
 	}
 	*destString = ((type == k0_TextTypeInscription) ? 0x81 : '\0');
 }
 
 Thing DungeonMan::f166_getUnusedThing(uint16 thingType) {
-	int16 L0288_i_ThingIndex;
-	int16 L0289_i_ThingDataByteCount;
-	int16 L0290_i_ThingCount;
-	Thing* L0291_ps_Generic;
-	Thing L0292_T_Thing;
-
-
-	L0290_i_ThingCount = _vm->_dungeonMan->_g278_dungeonFileHeader._thingCounts[getFlag(thingType, k0x7FFF_thingType)];
+	int16 thingCount = _vm->_dungeonMan->_g278_dungeonFileHeader._thingCounts[getFlag(thingType, k0x7FFF_thingType)];
 	if (thingType == (k0x8000_championBones | k10_JunkThingType)) {
 		thingType = k10_JunkThingType;
-	} else {
-		if (thingType == k10_JunkThingType) {
-			L0290_i_ThingCount -= 3; /* Always keep 3 unused JUNK things for the bones of dead champions */
-		}
-	}
-	L0288_i_ThingIndex = L0290_i_ThingCount;
-	L0289_i_ThingDataByteCount = g235_ThingDataWordCount[thingType] >> 1;
-	L0291_ps_Generic = (Thing*)_vm->_dungeonMan->_g284_thingData[thingType];
-	for (;;) { /*_Infinite loop_*/
-		if (*L0291_ps_Generic == Thing::_none) { /* If thing data is unused */
-			L0292_T_Thing = Thing((thingType << 10) | (L0290_i_ThingCount - L0288_i_ThingIndex));
-			break;
-		}
-		if (--L0288_i_ThingIndex) { /* If there are thing data left to process */
-			L0291_ps_Generic += L0289_i_ThingDataByteCount; /* Proceed to the next thing data */
-		} else {
-			if ((L0292_T_Thing = f165_getDiscardTHing(thingType)) == Thing::_none) {
-				return Thing::_none;
-			}
-			L0291_ps_Generic = (Thing*)_vm->_dungeonMan->f156_getThingData(L0292_T_Thing);
-			break;
-		}
-	}
-	memset(L0291_ps_Generic, 0, L0289_i_ThingDataByteCount * 2);
+	} else if (thingType == k10_JunkThingType)
+		thingCount -= 3; /* Always keep 3 unused JUNK things for the bones of dead champions */
 
-	*L0291_ps_Generic = Thing::_endOfList;
-	return L0292_T_Thing;
+	int16 thingIdx = thingCount;
+	int16 thingDataByteCount = g235_ThingDataWordCount[thingType] >> 1;
+	Thing *thingPtr = (Thing *)_vm->_dungeonMan->_g284_thingData[thingType];
+
+	Thing curThing;
+	for (;;) { /*_Infinite loop_*/
+		if (*thingPtr == Thing::_none) { /* If thing data is unused */
+			curThing = Thing((thingType << 10) | (thingCount - thingIdx));
+			break;
+		}
+		if (--thingIdx) { /* If there are thing data left to process */
+			thingPtr += thingDataByteCount; /* Proceed to the next thing data */
+		} else {
+			curThing = f165_getDiscardThing(thingType);
+			if (curThing == Thing::_none)
+				return Thing::_none;
+
+			thingPtr = (Thing *)_vm->_dungeonMan->f156_getThingData(curThing);
+			break;
+		}
+	}
+	memset(thingPtr, 0, thingDataByteCount * 2);
+
+	*thingPtr = Thing::_endOfList;
+	return curThing;
 }
 
 uint16 DungeonMan::f140_getObjectWeight(Thing thing) {
-	static const uint16 g241_junkInfo[] = { // @ G0241_auc_Graphic559_JunkInfo
+	static const uint16 junkInfo[] = { // @ G0241_auc_Graphic559_JunkInfo
 		// COMPASS - WATERSKIN - JEWEL SYMAL - ILLUMULET - ASHES
 		1, 3, 2, 2, 4,
 		// BONES - COPPER COIN - SILVER COIN - GOLD COIN - IRON KEY
@@ -1245,25 +1214,26 @@ uint16 DungeonMan::f140_getObjectWeight(Thing thing) {
 		2, 0, 8
 	};
 
-	Junk* junk;
-	uint16 weight = (uint16)-1; // initialization is not present in original
-
 	if (thing == Thing::_none)
 		return 0;
 
-	junk = (Junk*)f156_getThingData(thing);
+	// Initialization is not present in original
+	// Set to 0 by default as it's the default value used for Thing::_none
+	uint16 weight = 0;
+	Junk *junk = (Junk *)f156_getThingData(thing);
+
 	switch (thing.getType()) {
 	case k5_WeaponThingType:
-		weight = g238_WeaponInfo[((Weapon*)junk)->getType()]._weight;
+		weight = g238_WeaponInfo[((Weapon *)junk)->getType()]._weight;
 		break;
 	case k6_ArmourThingType:
-		weight = g239_ArmourInfo[((Armour*)junk)->getType()]._weight;
+		weight = g239_ArmourInfo[((Armour *)junk)->getType()]._weight;
 		break;
 	case k10_JunkThingType:
-		weight = g241_junkInfo[junk->getType()];
-		if (junk->getType() == k1_JunkTypeWaterskin) {
+		weight = junkInfo[junk->getType()];
+		if (junk->getType() == k1_JunkTypeWaterskin)
 			weight += junk->getChargeCount() << 1;
-		}
+
 		break;
 	case k9_ContainerThingType:
 		weight = 50;
@@ -1274,19 +1244,18 @@ uint16 DungeonMan::f140_getObjectWeight(Thing thing) {
 		}
 		break;
 	case k8_PotionThingType:
-		if (((Potion*)junk)->getType() == k20_PotionTypeEmptyFlask) {
+		if (((Potion*)junk)->getType() == k20_PotionTypeEmptyFlask)
 			weight = 1;
-		} else {
+		else
 			weight = 3;
-		}
 		break;
 	case k7_ScrollThingType:
 		weight = 1;
+		break;
 	}
 
 	return weight; // this is garbage if none of the branches were taken
 }
-
 
 int16 DungeonMan::f141_getObjectInfoIndex(Thing thing) {
 	uint16 *rawType = f156_getThingData(thing);
@@ -1312,43 +1281,42 @@ void DungeonMan::f163_linkThingToList(Thing thingToLink, Thing thingInList, int1
 	if (thingToLink == Thing::_endOfList)
 		return;
 
-	Thing *L0269_ps_Generic = (Thing *)f156_getThingData(thingToLink);
-	*L0269_ps_Generic = Thing::_endOfList;
+	Thing *thingPtr = (Thing *)f156_getThingData(thingToLink);
+	*thingPtr = Thing::_endOfList;
 	/* If mapX >= 0 then the thing is linked to the list of things on the specified square else it is linked at the end of the specified thing list */
 	if (mapX >= 0) {
-		byte *L0268_puc_Square = &_g271_currMapData[mapX][mapY];
-		if (getFlag(*L0268_puc_Square, k0x0010_ThingListPresent)) {
+		byte *currSquare = &_g271_currMapData[mapX][mapY];
+		if (getFlag(*currSquare, k0x0010_ThingListPresent)) {
 			thingInList = f161_getSquareFirstThing(mapX, mapY);
 		} else {
-			setFlag(*L0268_puc_Square, k0x0010_ThingListPresent);
+			setFlag(*currSquare, k0x0010_ThingListPresent);
 			uint16 * tmp = _g270_currMapColCumulativeSquareFirstThingCount + mapX + 1;
-			uint16 AL0266_ui_Column = _g282_dungeonColumCount - (_g281_dungeonMapsFirstColumnIndex[_g272_currMapIndex] + mapX) - 1;
-			while (AL0266_ui_Column--) { /* For each column starting from and after the column containing the square where the thing is added */
+			uint16 currColumn = _g282_dungeonColumCount - (_g281_dungeonMapsFirstColumnIndex[_g272_currMapIndex] + mapX) - 1;
+			while (currColumn--) { /* For each column starting from and after the column containing the square where the thing is added */
 				(*tmp++)++; /* Increment the cumulative first thing count */
 			}
-			uint16 L0270_ui_MapY = 0;
-			L0268_puc_Square -= mapY;
-			uint16 AL0266_ui_SquareFirstThingIndex = _g270_currMapColCumulativeSquareFirstThingCount[mapX];
-			while (L0270_ui_MapY++ != mapY) {
-				if (getFlag(*L0268_puc_Square++, k0x0010_ThingListPresent)) {
-					AL0266_ui_SquareFirstThingIndex++;
-				}
+			uint16 currMapY = 0;
+			currSquare -= mapY;
+			uint16 currSquareFirstThingIndex = _g270_currMapColCumulativeSquareFirstThingCount[mapX];
+			while (currMapY++ != mapY) {
+				if (getFlag(*currSquare++, k0x0010_ThingListPresent))
+					currSquareFirstThingIndex++;
 			}
-			Thing *L0267_pT_Thing = &_g283_squareFirstThings[AL0266_ui_SquareFirstThingIndex];
+			Thing *currThing = &_g283_squareFirstThings[currSquareFirstThingIndex];
 			// the second '- 1' is for the loop initialization, > 0 is because we are copying from one behind
-			for (int16 i = _g278_dungeonFileHeader._squareFirstThingCount - AL0266_ui_SquareFirstThingIndex - 1 - 1; i > 0; --i)
-				L0267_pT_Thing[i] = L0267_pT_Thing[i - 1];
+			for (int16 i = _g278_dungeonFileHeader._squareFirstThingCount - currSquareFirstThingIndex - 1 - 1; i > 0; --i)
+				currThing[i] = currThing[i - 1];
 
-			*L0267_pT_Thing = thingToLink;
+			*currThing = thingToLink;
 			return;
 		}
 	}
-	Thing L0265_T_Thing = f159_getNextThing(thingInList);
-	while (L0265_T_Thing != Thing::_endOfList) {
-		L0265_T_Thing = f159_getNextThing(thingInList = L0265_T_Thing);
-	}
-	L0269_ps_Generic = (Thing *)f156_getThingData(thingInList);
-	*L0269_ps_Generic = thingToLink;
+	Thing nextThing = f159_getNextThing(thingInList);
+	while (nextThing != Thing::_endOfList)
+		nextThing = f159_getNextThing(thingInList = nextThing);
+
+	thingPtr = (Thing *)f156_getThingData(thingInList);
+	*thingPtr = thingToLink;
 }
 
 WeaponInfo* DungeonMan::f158_getWeaponInfo(Thing thing) {
@@ -1357,11 +1325,8 @@ WeaponInfo* DungeonMan::f158_getWeaponInfo(Thing thing) {
 }
 
 int16 DungeonMan::f142_getProjectileAspect(Thing thing) {
-	ThingType thingType;
-	int16 projAspOrd;
-	WeaponInfo *weaponInfo;
-
-	if ((thingType = thing.getType()) == k15_ExplosionThingType) {
+	ThingType thingType = thing.getType();
+	if (thingType == k15_ExplosionThingType) {
 		if (thing == Thing::_explFireBall)
 			return -_vm->M0_indexToOrdinal(k10_ProjectileAspectExplosionFireBall);
 		if (thing == Thing::_explSlime)
@@ -1373,8 +1338,9 @@ int16 DungeonMan::f142_getProjectileAspect(Thing thing) {
 
 		return -_vm->M0_indexToOrdinal(k11_ProjectileAspectExplosionDefault);
 	} else if (thingType == k5_WeaponThingType) {
-		weaponInfo = f158_getWeaponInfo(thing);
-		if (projAspOrd = weaponInfo->getProjectileAspectOrdinal())
+		WeaponInfo *weaponInfo = f158_getWeaponInfo(thing);
+		int16 projAspOrd = weaponInfo->getProjectileAspectOrdinal();
+		if (projAspOrd)
 			return -projAspOrd;
 	}
 
@@ -1382,25 +1348,20 @@ int16 DungeonMan::f142_getProjectileAspect(Thing thing) {
 }
 
 int16 DungeonMan::f154_getLocationAfterLevelChange(int16 mapIndex, int16 levelDelta, int16* mapX, int16* mapY) {
-	int16 newMapX;
-	int16 newMapY;
-	int16 newLevel;
-	int16 offset;
-	Map* map;
-	int16 targetMapIndex;
-
-
-	if (_g309_partyMapIndex == k255_mapIndexEntrance) {
+	if (_g309_partyMapIndex == k255_mapIndexEntrance)
 		return kM1_mapIndexNone;
-	}
-	map = _g277_dungeonMaps + mapIndex;
-	newMapX = map->_offsetMapX + *mapX;
-	newMapY = map->_offsetMapY + *mapY;
-	newLevel = map->_level + levelDelta;
+
+	Map *map = _g277_dungeonMaps + mapIndex;
+	int16 newMapX = map->_offsetMapX + *mapX;
+	int16 newMapY = map->_offsetMapY + *mapY;
+	int16 newLevel = map->_level + levelDelta;
 	map = _g277_dungeonMaps;
-	for (targetMapIndex = 0; targetMapIndex < _g278_dungeonFileHeader._mapCount; targetMapIndex++) {
-		if ((map->_level == newLevel) && (newMapX >= (offset = map->_offsetMapX)) && (newMapX <= (offset + map->_width)) && (newMapY >= (offset = map->_offsetMapY)) && (newMapY <= (offset + map->_height))) {
-			*mapY = newMapY - offset;
+
+	for (int16 targetMapIndex = 0; targetMapIndex < _g278_dungeonFileHeader._mapCount; targetMapIndex++) {
+		if ((map->_level == newLevel)
+		&& (newMapX >= map->_offsetMapX) && (newMapX <= map->_offsetMapX + map->_width)
+		&& (newMapY >= map->_offsetMapY) && (newMapY <= map->_offsetMapY + map->_height)) {
+			*mapY = newMapY - map->_offsetMapY;
 			*mapX = newMapX - map->_offsetMapX;
 			return targetMapIndex;
 		}
@@ -1411,163 +1372,147 @@ int16 DungeonMan::f154_getLocationAfterLevelChange(int16 mapIndex, int16 levelDe
 
 Thing DungeonMan::f162_getSquareFirstObject(int16 mapX, int16 mapY) {
 	Thing thing = f161_getSquareFirstThing(mapX, mapY);
-	while ((thing != Thing::_endOfList) && (thing.getType() < k4_GroupThingType)) {
+	while ((thing != Thing::_endOfList) && (thing.getType() < k4_GroupThingType))
 		thing = f159_getNextThing(thing);
-	}
+
 	return thing;
 }
 
 uint16 DungeonMan::f143_getArmourDefense(ArmourInfo* armourInfo, bool useSharpDefense) {
-	uint16 L0244_ui_Defense;
+	uint16 defense = armourInfo->_defense;
+	if (useSharpDefense)
+		defense = _vm->f30_getScaledProduct(defense, 3, getFlag(armourInfo->_attributes, k0x0007_ArmourAttributeSharpDefense) + 4);
 
-	L0244_ui_Defense = armourInfo->_defense;
-	if (useSharpDefense) {
-		L0244_ui_Defense = _vm->f30_getScaledProduct(L0244_ui_Defense, 3, getFlag(armourInfo->_attributes, k0x0007_ArmourAttributeSharpDefense) + 4);
-	}
-	return L0244_ui_Defense;
+	return defense;
 }
 
-Thing DungeonMan::f165_getDiscardTHing(uint16 thingType) {
-	uint16 L0276_ui_MapX;
-	uint16 L0277_ui_MapY;
-	Thing L0278_T_Thing;
-	uint16 L0279_ui_MapIndex;
-	byte* L0280_puc_Square;
-	Thing* L0281_pT_SquareFirstThing;
-	Thing* L0282_ps_Generic;
-	uint16 L0283_ui_DiscardThingMapIndex;
-	int L0284_i_CurrentMapIndex;
-	uint16 L0285_ui_MapWidth;
-	uint16 L0286_ui_MapHeight;
-	int L0287_i_ThingType;
-	static unsigned char G0294_auc_LastDiscardedThingMapIndex[16];
+Thing DungeonMan::f165_getDiscardThing(uint16 thingType) {
+	// CHECKME: Shouldn't it be saved in the savegames?
+	static unsigned char lastDiscardedThingMapIndex[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-
-	if (thingType == k15_ExplosionThingType) {
+	if (thingType == k15_ExplosionThingType)
 		return Thing::_none;
-	}
-	L0284_i_CurrentMapIndex = _vm->_dungeonMan->_g272_currMapIndex;
-	if (((L0279_ui_MapIndex = G0294_auc_LastDiscardedThingMapIndex[thingType]) == _vm->_dungeonMan->_g309_partyMapIndex) && (++L0279_ui_MapIndex >= _vm->_dungeonMan->_g278_dungeonFileHeader._mapCount)) {
-		L0279_ui_MapIndex = 0;
-	}
-	L0283_ui_DiscardThingMapIndex = L0279_ui_MapIndex;
+
+	int16 currentMapIdx = _vm->_dungeonMan->_g272_currMapIndex;
+	uint16 mapIndex = lastDiscardedThingMapIndex[thingType];
+	if ((mapIndex == _vm->_dungeonMan->_g309_partyMapIndex) && (++mapIndex >= _vm->_dungeonMan->_g278_dungeonFileHeader._mapCount))
+		mapIndex = 0;
+
+	uint16 discardThingMapIndex = mapIndex;
 	for (;;) { /*_Infinite loop_*/
-		L0285_ui_MapWidth = _vm->_dungeonMan->_g277_dungeonMaps[L0279_ui_MapIndex]._width;
-		L0286_ui_MapHeight = _vm->_dungeonMan->_g277_dungeonMaps[L0279_ui_MapIndex]._height;
-		L0280_puc_Square = _vm->_dungeonMan->_g279_dungeonMapData[L0279_ui_MapIndex][0];
-		L0281_pT_SquareFirstThing = &_vm->_dungeonMan->_g283_squareFirstThings[_vm->_dungeonMan->_g280_dungeonColumnsCumulativeSquareThingCount[_vm->_dungeonMan->_g281_dungeonMapsFirstColumnIndex[L0279_ui_MapIndex]]];
-		for (L0276_ui_MapX = 0; L0276_ui_MapX <= L0285_ui_MapWidth; L0276_ui_MapX++) {
-			for (L0277_ui_MapY = 0; L0277_ui_MapY <= L0286_ui_MapHeight; L0277_ui_MapY++) {
-				if (getFlag(*L0280_puc_Square++, k0x0010_ThingListPresent)) {
-					L0278_T_Thing = *L0281_pT_SquareFirstThing++;
-					if ((L0279_ui_MapIndex == _vm->_dungeonMan->_g309_partyMapIndex) && ((L0276_ui_MapX - _vm->_dungeonMan->_g306_partyMapX + 5) <= 10) && ((L0277_ui_MapY - _vm->_dungeonMan->_g307_partyMapY + 5) <= 10)) /* If square is too close to the party */
-						goto T0165029;
+		uint16 mapWidth = _vm->_dungeonMan->_g277_dungeonMaps[mapIndex]._width;
+		uint16 mapHeight = _vm->_dungeonMan->_g277_dungeonMaps[mapIndex]._height;
+		byte *currSquare = _vm->_dungeonMan->_g279_dungeonMapData[mapIndex][0];
+		Thing *squareFirstThing = &_vm->_dungeonMan->_g283_squareFirstThings[_vm->_dungeonMan->_g280_dungeonColumnsCumulativeSquareThingCount[_vm->_dungeonMan->_g281_dungeonMapsFirstColumnIndex[mapIndex]]];
+		
+		for (int16 currMapX = 0; currMapX <= mapWidth; currMapX++) {
+			for (int16 currMapY = 0; currMapY <= mapHeight; currMapY++) {
+				if (getFlag(*currSquare++, k0x0010_ThingListPresent)) {
+					Thing squareThing = *squareFirstThing++;
+					if ((mapIndex == _vm->_dungeonMan->_g309_partyMapIndex) && ((currMapX - _vm->_dungeonMan->_g306_partyMapX + 5) <= 10) && ((currMapY - _vm->_dungeonMan->_g307_partyMapY + 5) <= 10)) /* If square is too close to the party */
+						continue;
+
 					do {
-						if ((L0287_i_ThingType = L0278_T_Thing.getType()) == k3_SensorThingType) {
-							L0282_ps_Generic = (Thing*)_vm->_dungeonMan->f156_getThingData(L0278_T_Thing);
-							if (((Sensor*)L0282_ps_Generic)->getType()) /* If sensor is not disabled */
+						ThingType squareThingType = squareThing.getType();
+						if (squareThingType == k3_SensorThingType) {
+							Thing *squareThingData = (Thing*)_vm->_dungeonMan->f156_getThingData(squareThing);
+							if (((Sensor*)squareThingData)->getType()) /* If sensor is not disabled */
 								break;
-						} else {
-							if (L0287_i_ThingType == thingType) {
-								L0282_ps_Generic = (Thing*)_vm->_dungeonMan->f156_getThingData(L0278_T_Thing);
-								switch (thingType) {
-								case k4_GroupThingType:
-									if (((Group*)L0282_ps_Generic)->getDoNotDiscard())
-										continue;
-								case k14_ProjectileThingType:
-									_vm->_dungeonMan->f173_setCurrentMap(L0279_ui_MapIndex);
-									if (thingType == k4_GroupThingType) {
-										_vm->_groupMan->f188_dropGroupPossessions(L0276_ui_MapX, L0277_ui_MapY, L0278_T_Thing, kM1_soundModeDoNotPlaySound);
-										_vm->_groupMan->f189_delete(L0276_ui_MapX, L0277_ui_MapY);
-									} else {
-										_vm->_projexpl->f214_projectileDeleteEvent(L0278_T_Thing);
-										f164_unlinkThingFromList(L0278_T_Thing, Thing(0), L0276_ui_MapX, L0277_ui_MapY);
-										_vm->_projexpl->f215_projectileDelete(L0278_T_Thing, 0, L0276_ui_MapX, L0277_ui_MapY);
-									}
-									break;
-								case k6_ArmourThingType:
-									if (((Armour*)L0282_ps_Generic)->getDoNotDiscard())
-										continue;
-									goto T0165026;
-								case k5_WeaponThingType:
-									if (((Weapon*)L0282_ps_Generic)->getDoNotDiscard())
-										continue;
-									goto T0165026;
-								case k10_JunkThingType:
-									if (((Junk*)L0282_ps_Generic)->getDoNotDiscard())
-										continue;
-									goto T0165026;
-								case k8_PotionThingType:
-									if (((Potion*)L0282_ps_Generic)->getDoNotDiscard())
-										continue;
-T0165026:
-									_vm->_dungeonMan->f173_setCurrentMap(L0279_ui_MapIndex);
-									_vm->_moveSens->f267_getMoveResult(L0278_T_Thing, L0276_ui_MapX, L0277_ui_MapY, kM1_MapXNotOnASquare, 0);
+						} else if (squareThingType == thingType) {
+							Thing *squareThingData = (Thing*)_vm->_dungeonMan->f156_getThingData(squareThing);
+							switch (thingType) {
+							case k4_GroupThingType:
+								if (((Group*)squareThingData)->getDoNotDiscard())
+									continue;
+							case k14_ProjectileThingType:
+								_vm->_dungeonMan->f173_setCurrentMap(mapIndex);
+								if (thingType == k4_GroupThingType) {
+									_vm->_groupMan->f188_dropGroupPossessions(currMapX, currMapY, squareThing, kM1_soundModeDoNotPlaySound);
+									_vm->_groupMan->f189_delete(currMapX, currMapY);
+								} else {
+									_vm->_projexpl->f214_projectileDeleteEvent(squareThing);
+									f164_unlinkThingFromList(squareThing, Thing(0), currMapX, currMapY);
+									_vm->_projexpl->f215_projectileDelete(squareThing, 0, currMapX, currMapY);
 								}
-								_vm->_dungeonMan->f173_setCurrentMap(L0284_i_CurrentMapIndex);
-								G0294_auc_LastDiscardedThingMapIndex[thingType] = L0279_ui_MapIndex;
-								return Thing(L0278_T_Thing.getTypeAndIndex());
+								break;
+							case k6_ArmourThingType:
+								if (((Armour*)squareThingData)->getDoNotDiscard())
+									continue;
+
+								_vm->_dungeonMan->f173_setCurrentMap(mapIndex);
+								_vm->_moveSens->f267_getMoveResult(squareThing, currMapX, currMapY, kM1_MapXNotOnASquare, 0);
+								break;
+							case k5_WeaponThingType:
+								if (((Weapon*)squareThingData)->getDoNotDiscard())
+									continue;
+
+								_vm->_dungeonMan->f173_setCurrentMap(mapIndex);
+								_vm->_moveSens->f267_getMoveResult(squareThing, currMapX, currMapY, kM1_MapXNotOnASquare, 0);
+								break;
+							case k10_JunkThingType:
+								if (((Junk*)squareThingData)->getDoNotDiscard())
+									continue;
+
+								_vm->_dungeonMan->f173_setCurrentMap(mapIndex);
+								_vm->_moveSens->f267_getMoveResult(squareThing, currMapX, currMapY, kM1_MapXNotOnASquare, 0);
+								break;
+							case k8_PotionThingType:
+								if (((Potion*)squareThingData)->getDoNotDiscard())
+									continue;
+
+								_vm->_dungeonMan->f173_setCurrentMap(mapIndex);
+								_vm->_moveSens->f267_getMoveResult(squareThing, currMapX, currMapY, kM1_MapXNotOnASquare, 0);
+								break;
 							}
+							_vm->_dungeonMan->f173_setCurrentMap(currentMapIdx);
+							lastDiscardedThingMapIndex[thingType] = mapIndex;
+							return Thing(squareThing.getTypeAndIndex());
 						}
-					} while ((L0278_T_Thing = _vm->_dungeonMan->f159_getNextThing(L0278_T_Thing)) != Thing::_endOfList);
-T0165029:
-					;
+					} while ((squareThing = _vm->_dungeonMan->f159_getNextThing(squareThing)) != Thing::_endOfList);
 				}
 			}
 		}
-		if ((L0279_ui_MapIndex == _vm->_dungeonMan->_g309_partyMapIndex) || (_vm->_dungeonMan->_g278_dungeonFileHeader._mapCount <= 1)) {
-			G0294_auc_LastDiscardedThingMapIndex[thingType] = L0279_ui_MapIndex;
+		if ((mapIndex == _vm->_dungeonMan->_g309_partyMapIndex) || (_vm->_dungeonMan->_g278_dungeonFileHeader._mapCount <= 1)) {
+			lastDiscardedThingMapIndex[thingType] = mapIndex;
 			return Thing::_none;
 		}
+
 		do {
-			if (++L0279_ui_MapIndex >= _vm->_dungeonMan->_g278_dungeonFileHeader._mapCount) {
-				L0279_ui_MapIndex = 0;
-			}
-		} while (L0279_ui_MapIndex == _vm->_dungeonMan->_g309_partyMapIndex);
-		if (L0279_ui_MapIndex == L0283_ui_DiscardThingMapIndex) {
-			L0279_ui_MapIndex = _vm->_dungeonMan->_g309_partyMapIndex;
-		}
+			if (++mapIndex >= _vm->_dungeonMan->_g278_dungeonFileHeader._mapCount)
+				mapIndex = 0;
+		} while (mapIndex == _vm->_dungeonMan->_g309_partyMapIndex);
+
+		if (mapIndex == discardThingMapIndex)
+			mapIndex = _vm->_dungeonMan->_g309_partyMapIndex;
 	}
 }
 
 uint16 DungeonMan::f144_getCreatureAttributes(Thing thing) {
-	Group* L0245_ps_Group;
-
-	L0245_ps_Group = (Group*)_vm->_dungeonMan->f156_getThingData(thing);
-	return g243_CreatureInfo[L0245_ps_Group->_type]._attributes;
+	Group *currGroup = (Group *)_vm->_dungeonMan->f156_getThingData(thing);
+	return g243_CreatureInfo[currGroup->_type]._attributes;
 }
 
 void DungeonMan::f146_setGroupCells(Group* group, uint16 cells, uint16 mapIndex) {
-	if (mapIndex == _vm->_dungeonMan->_g309_partyMapIndex) {
+	if (mapIndex == _vm->_dungeonMan->_g309_partyMapIndex)
 		_vm->_groupMan->_g375_activeGroups[group->getActiveGroupIndex()]._cells = cells;
-	} else {
+	else
 		group->_cells = cells;
-	}
 }
 
 void DungeonMan::f148_setGroupDirections(Group* group, int16 dir, uint16 mapIndex) {
-	if (mapIndex == _vm->_dungeonMan->_g309_partyMapIndex) {
+	if (mapIndex == _vm->_dungeonMan->_g309_partyMapIndex)
 		_vm->_groupMan->_g375_activeGroups[group->getActiveGroupIndex()]._directions = (Direction)dir;
-	} else {
+	else
 		group->setDir(M21_normalizeModulo4(dir));
-	}
 }
 
 bool DungeonMan::f139_isCreatureAllowedOnMap(Thing thing, uint16 mapIndex) {
-	int16 L0234_i_Counter;
-	int16 L0235_i_CreatureType;
-	byte* L0236_puc_Multiple;
-#define AL0236_puc_Group               L0236_puc_Multiple
-#define AL0236_puc_AllowedCreatureType L0236_puc_Multiple
-	Map* L0237_ps_Map;
-
-	L0235_i_CreatureType = ((Group*)_vm->_dungeonMan->f156_getThingData(thing))->_type;
-	L0237_ps_Map = &_vm->_dungeonMan->_g277_dungeonMaps[mapIndex];
-	AL0236_puc_AllowedCreatureType = _vm->_dungeonMan->_g279_dungeonMapData[mapIndex][L0237_ps_Map->_width] + L0237_ps_Map->_height + 1;
-	for (L0234_i_Counter = L0237_ps_Map->_creatureTypeCount; L0234_i_Counter > 0; L0234_i_Counter--) {
-		if (*AL0236_puc_AllowedCreatureType++ == L0235_i_CreatureType) {
+	int16 creatureType = ((Group*)_vm->_dungeonMan->f156_getThingData(thing))->_type;
+	Map *map = &_vm->_dungeonMan->_g277_dungeonMaps[mapIndex];
+	byte *allowedCreatureType = _vm->_dungeonMan->_g279_dungeonMapData[mapIndex][map->_width] + map->_height + 1;
+	for (int16 L0234_i_Counter = map->_creatureTypeCount; L0234_i_Counter > 0; L0234_i_Counter--) {
+		if (*allowedCreatureType++ == creatureType)
 			return true;
-		}
 	}
 	return false;
 }
@@ -1584,15 +1529,12 @@ void DungeonMan::f164_unlinkThingFromList(Thing thingToUnlink, Thing thingInList
 #define AL0275_pui_CumulativeFirstThingCount L0275_pui_Multiple
 
 
-	if (thingToUnlink == Thing::_endOfList) {
+	if (thingToUnlink == Thing::_endOfList)
 		return;
-	}
 
-	{
-		uint16 tmp = thingToUnlink.toUint16();
-		clearFlag(tmp, 0xC000);
-		thingToUnlink = Thing(tmp);
-	}
+	uint16 tmp = thingToUnlink.toUint16();
+	clearFlag(tmp, 0xC000);
+	thingToUnlink = Thing(tmp);
 
 	if (mapX >= 0) {
 		L0274_ps_Generic = (Thing*)_vm->_dungeonMan->f156_getThingData(thingToUnlink);
@@ -1609,25 +1551,27 @@ void DungeonMan::f164_unlinkThingFromList(Thing thingToUnlink, Thing thingInList
 			while (AL0272_ui_Column--) { /* For each column starting from and after the column containing the square where the thing is unlinked */
 				(*(uint16*)AL0275_pui_CumulativeFirstThingCount++)--; /* Decrement the cumulative first thing count */
 			}
-			goto T0164011;
+			*L0274_ps_Generic = Thing::_endOfList;
+			return;
 		}
 		if (((Thing*)AL0275_pT_Thing)->getTypeAndIndex() == thingToUnlink.toUint16()) {
 			*AL0275_pT_Thing = *L0274_ps_Generic;
-			goto T0164011;
+			*L0274_ps_Generic = Thing::_endOfList;
+			return;
 		}
 		thingInList = *AL0275_pT_Thing;
 	}
 	L0273_T_Thing = _vm->_dungeonMan->f159_getNextThing(thingInList);
 	while (L0273_T_Thing.getTypeAndIndex() != thingToUnlink.toUint16()) {
 		if ((L0273_T_Thing == Thing::_endOfList) || (L0273_T_Thing == Thing::_none)) {
-			goto T0164011;
+			*L0274_ps_Generic = Thing::_endOfList;
+			return;
 		}
 		L0273_T_Thing = _vm->_dungeonMan->f159_getNextThing(thingInList = L0273_T_Thing);
 	}
 	L0274_ps_Generic = (Thing*)_vm->_dungeonMan->f156_getThingData(thingInList);
 	*L0274_ps_Generic = _vm->_dungeonMan->f159_getNextThing(L0273_T_Thing);
 	L0274_ps_Generic = (Thing*)_vm->_dungeonMan->f156_getThingData(thingToUnlink);
-T0164011:
 	*L0274_ps_Generic = Thing::_endOfList;
 }
 
