@@ -1298,7 +1298,10 @@ void ChampionMan::f320_applyAndDrawPendingDamageAndWounds() {
 		if (!curHealth)
 			continue;
 
-		curHealth -= pendingDamage;
+		// DEBUG CODE
+		if (_vm->_console->_debugGodmodeHP == false)
+			curHealth -= pendingDamage;
+
 		if (curHealth <= 0) {
 			f319_championKill(championIndex);
 		} else {
@@ -2321,7 +2324,7 @@ void ChampionMan::f281_renameChampion(Champion* champ) {
 				return;
 			_vm->_displayMan->updateScreen();
 				//_vm->f22_delay(1);
-			
+
 			if (eventType == Common::EVENT_LBUTTONDOWN) {
 				// If left mouse button status has changed
 
@@ -2484,7 +2487,7 @@ uint16 ChampionMan::f303_getSkillLevel(int16 champIndex, uint16 skillIndex) {
 			break;
 		case k13_ChampionSkillHeal:
 			// The skill modifiers of these two objects are not cumulative
-			if ((neckIconIndex == k120_IconIndiceJunkGemOfAges) || (actionHandIconIndex == k66_IconIndiceWeaponSceptreOfLyf)) 
+			if ((neckIconIndex == k120_IconIndiceJunkGemOfAges) || (actionHandIconIndex == k66_IconIndiceWeaponSceptreOfLyf))
 				skillLevel += 1;
 			break;
 		case k14_ChampionSkillInfluence:
