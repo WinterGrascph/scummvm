@@ -56,6 +56,7 @@
 #include "projexpl.h"
 #include "dialog.h"
 #include <graphics/cursorman.h>
+#include <advancedDetector.h>
 
 namespace DM {
 void warning(bool repeat, const char* s, ...) {
@@ -140,7 +141,7 @@ int16 M38_distance(int16 mapx1, int16 mapy1, int16 mapx2, int16 mapy2) {
 	return ABS(mapx1 - mapx2) + ABS(mapy1 - mapy2);
 }
 
-DMEngine::DMEngine(OSystem *syst) : Engine(syst), _console(nullptr) {
+DMEngine::DMEngine(OSystem *syst, const ADGameDescription *desc) : Engine(syst), _console(nullptr), _gameVersion(desc) {
 // Do not load data files
 // Do not initialize graphics here
 // Do not initialize audio devices here
@@ -553,9 +554,35 @@ void DMEngine::f441_processEntrance() {
 }
 
 void DMEngine::f444_endGame(bool doNotDrawCreditsOnly) {
-	// TODO: localization
-	static Box restartOuterBox = Box(103, 217, 145, 159);
-	static Box restartInnerBox = Box(105, 215, 147, 157);
+
+	static Box G0013_s_Graphic562_Box_Endgame_Restart_Outer_EN_ANY = {103, 217, 145, 159};
+	static Box G0014_s_Graphic562_Box_Endgame_Restart_Inner_EN_ANY = {105, 215, 147, 157};
+
+	static Box G0013_s_Graphic562_Box_Endgame_Restart_Outer_GR_GRE = {82, 238, 145, 159};
+	static Box G0014_s_Graphic562_Box_Endgame_Restart_Inner_GR_GRE = {84, 236, 147, 157};
+
+	static Box G0013_s_Graphic562_Box_Endgame_Restart_Outer_FR_FRA = {100, 220, 145, 159};
+	static Box G0014_s_Graphic562_Box_Endgame_Restart_Inner_FR_FRA = {102, 218, 147, 157};
+
+	Box restartOuterBox;
+	Box restartInnerBox;
+
+	switch (getGameLanguage()) { // localized
+	default:
+	case Common::EN_ANY:
+		restartOuterBox = G0013_s_Graphic562_Box_Endgame_Restart_Outer_EN_ANY;
+		restartInnerBox = G0014_s_Graphic562_Box_Endgame_Restart_Inner_EN_ANY;
+		break;
+	case Common::GR_GRE:
+		restartOuterBox = G0013_s_Graphic562_Box_Endgame_Restart_Outer_GR_GRE;
+		restartInnerBox = G0014_s_Graphic562_Box_Endgame_Restart_Inner_GR_GRE;
+		break;
+	case Common::FR_FRA:
+		restartOuterBox = G0013_s_Graphic562_Box_Endgame_Restart_Outer_FR_FRA;
+		restartInnerBox = G0014_s_Graphic562_Box_Endgame_Restart_Inner_FR_FRA;
+		break;
+	}
+
 	static Box theEndBox = Box(120, 199, 95, 108);
 	static Box championMirrorBox = Box(11, 74, 7, 49);
 	static Box championPortraitBox = Box(27, 58, 13, 41);
@@ -646,7 +673,14 @@ T0444017:
 			_displayMan->_g578_useByteBoxCoordinates = false;
 			_displayMan->D24_fillScreenBox(restartOuterBox, k12_ColorDarkestGray);
 			_displayMan->D24_fillScreenBox(restartInnerBox, k0_ColorBlack);
-			_textMan->f53_printToLogicalScreen(110, 154, k4_ColorCyan, k0_ColorBlack, "RESTART THIS GAME");
+
+			switch (getGameLanguage()) { // localized
+			default:
+			case Common::EN_ANY: _textMan->f53_printToLogicalScreen(110, 154, k4_ColorCyan, k0_ColorBlack, "RESTART THIS GAME"); break;
+			case Common::GR_GRE: _textMan->f53_printToLogicalScreen(110, 154, k4_ColorCyan, k0_ColorBlack, "DIESES SPIEL NEU STARTEN"); break;
+			case Common::FR_FRA: _textMan->f53_printToLogicalScreen(110, 154, k4_ColorCyan, k0_ColorBlack, "RECOMMENCER CE JEU"); break;
+			}
+
 			curPalette[1] = D03_RGB_PINK;
 			curPalette[4] = D09_RGB_WHITE;
 			_eventMan->_g441_primaryMouseInput = g446_PrimaryMouseInput_RestartGame;
@@ -927,10 +961,10 @@ void DMEngine::f445_STARTEND_fuseSequenceUpdate() {
 	f65_playPendingSound();
 	_eventMan->f357_discardAllInput();
 	_displayMan->updateScreen();
-	f22_delay(1);
+	f22_delay(2);
 	_g313_gameTime++; /* BUG0_71 Some timings are too short on fast computers.
 					  The ending animation when Lord Chaos is fused plays too quickly because the execution speed is not limited */
-
 }
 
+Common::Language DMEngine::getGameLanguage() { return _gameVersion->language; }
 } // End of namespace DM
