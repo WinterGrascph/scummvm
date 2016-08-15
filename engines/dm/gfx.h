@@ -310,12 +310,6 @@ enum GraphicIndice {
 };
 
 extern byte g17_PalChangesNoChanges[16];
-extern uint16 gK57_PalSwoosh[16]; // @ K0057_aui_Palette_Swoosh
-extern uint16 gK150_PalMousePointer[16];	// @ K0150_aui_Palette_MousePointer
-extern uint16 g19_PalCredits[16];  // @ G0019_aui_Graphic562_Palette_Credits
-extern uint16 g20_PalEntrance[16]; // @ G0020_aui_Graphic562_Palette_Entrance
-extern uint16 g21_PalDungeonView[6][16]; // @ G0021_aaui_Graphic562_Palette_DungeonView
-
 
 // in all cases, where a function takes a Box, it expects it to contain inclusive boundaries
 class Box {
@@ -416,8 +410,6 @@ public:
 	FieldAspect() {}
 }; // @ FIELD_ASPECT
 
-
-
 class CreatureAspect {
 public:
 	uint16 _firstNativeBitmapRelativeIndex;
@@ -434,16 +426,14 @@ private:
 public:
 
 	CreatureAspect(uint16 uint161, uint16 uint162, byte byte0, byte byte1, byte byte2, byte byte3, byte byte4, byte byte5, byte byte6, byte byte7)
-		: _firstNativeBitmapRelativeIndex(uint161),
-		_firstDerivedBitmapIndex(uint162),
-		_byteWidthFront(byte0),
-		_heightFront(byte1),
-		_byteWidthSide(byte2),
-		_heightSide(byte3),
-		_byteWidthAttack(byte4),
-		_heightAttack(byte5),
-		_coordinateSet_TransparentColor(byte6),
-		_replacementColorSetIndices(byte7) {}
+		: _firstNativeBitmapRelativeIndex(uint161), _firstDerivedBitmapIndex(uint162), _byteWidthFront(byte0),
+		_heightFront(byte1), _byteWidthSide(byte2), _heightSide(byte3), _byteWidthAttack(byte4),
+		_heightAttack(byte5), _coordinateSet_TransparentColor(byte6), _replacementColorSetIndices(byte7) {}
+
+	CreatureAspect() :
+		_firstNativeBitmapRelativeIndex(0), _firstDerivedBitmapIndex(0), _byteWidthFront(0),
+		_heightFront(0), _byteWidthSide(0), _heightSide(0), _byteWidthAttack(0),
+		_heightAttack(0), _coordinateSet_TransparentColor(0), _replacementColorSetIndices(0) {}
 
 	byte getCoordSet() { return (_coordinateSet_TransparentColor >> 4) & 0xF; } // @ M71_COORDINATE_SET
 	byte getTranspColour() { return  _coordinateSet_TransparentColor & 0xF; } // @ M72_TRANSPARENT_COLOR
@@ -462,6 +452,8 @@ public:
 	ObjectAspect(byte firstN, byte firstD, byte byteWidth, byte h, byte grap, byte coord) :
 		_firstNativeBitmapRelativeIndex(firstN), _firstDerivedBitmapRelativeIndex(firstD),
 		_byteWidth(byteWidth), _height(h), _graphicInfo(grap), _coordinateSet(coord) {}
+	ObjectAspect() : _firstNativeBitmapRelativeIndex(0), _firstDerivedBitmapRelativeIndex(0),
+		_byteWidth(0), _height(0), _graphicInfo(0), _coordinateSet(0) {}
 }; // @ OBJECT_ASPECT
 
 class ProjectileAspect {
@@ -475,6 +467,9 @@ public:
 	ProjectileAspect(byte firstN, byte firstD, byte byteWidth, byte h, uint16 grap) :
 		_firstNativeBitmapRelativeIndex(firstN), _firstDerivedBitmapRelativeIndex(firstD),
 		_byteWidth(byteWidth), _height(h), _graphicInfo(grap) {}
+
+	ProjectileAspect() : _firstNativeBitmapRelativeIndex(0), 
+		_firstDerivedBitmapRelativeIndex(0), _byteWidth(0), _height(0), _graphicInfo(0) {}
 }; // @ PROJECTIL_ASPECT
 
 class CreatureReplColorSet {
@@ -787,7 +782,12 @@ public:
 	byte _projectileScales[7];
 	ExplosionAspect _explosionAspects[k4_ExplosionAspectCount];
 	Frame _frameWallD3R2;
-	Frame g163_FrameWalls[12];
+	Frame _frameWalls163[12];
+	CreatureAspect _creatureAspects219[k27_CreatureTypeCount];
+	ObjectAspect _objectAspects209[k85_ObjAspectCount]; // @ G0209_as_Graphic558_ObjectAspects
+	ProjectileAspect _projectileAspect[k14_ProjectileAspectCount]; // @ G0210_as_Graphic558_ProjectileAspects
+	uint16 _palCredits[16]; // @ G0019_aui_Graphic562_Palette_Credits
+	uint16 _palDungeonView[6][16]; // @ G0021_aaui_Graphic562_Palette_DungeonView
 
 	bool f491_isDerivedBitmapInCache(int16 derivedBitmapIndex); // @  F0491_CACHE_IsDerivedBitmapInCache
 	byte *f492_getDerivedBitmap(int16 derivedBitmapIndex); // @ F0492_CACHE_GetDerivedBitmap
