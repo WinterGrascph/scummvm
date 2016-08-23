@@ -17,4 +17,5 @@ Code stuff todo:
 	Complete stub methods(blitShrink, blitmask, scroller)
 	Add proper save header, add error handling to it
 	Add translations to f433_processCommand140_saveGame 'LOAD'
+	Add check for if the currect game version accepts the save file to be loaded
 	
